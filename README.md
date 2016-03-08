@@ -23,3 +23,34 @@ Consider two replicas, with the same initial state of 0; at each one, a client o
 
 The first vector is the P Counter. It holds all the increments for the counter. The second vector is the N Counter, it holds all the decrements.
 Each replica only increments its own entry in the vector. The value of the counter is the difference between the sum of the P Counter and the sum of the N Counter.
+
+Examples
+===========
+PN-Counter:
+```java
+        PNCounter<String> replica1 = new PNCounter<String>();
+        PNCounter<String> replica2 = new PNCounter<String>();
+
+        replica1.increment("hostname1");System.out.println("Replica1 value =" + replica1.value());
+        replica1.increment("hostname1");System.out.println("Replica1 value =" + replica1.value());
+
+
+        replica2.increment("hostname2");System.out.println("\nReplica2 value =" + replica2.value());
+        replica2.increment("hostname2");System.out.println("Replica2 value =" + replica2.value());
+
+        replica1.merge( replica2 );
+        System.out.println("\nReplica1 value after merge = " + replica1.value());
+```
+
+Output:
+**********************************
+
+Replica1 value =1
+Replica1 value =2
+
+Replica2 value =1
+Replica2 value =2
+
+Replica1 value after merge = 4
+
+**********************************
