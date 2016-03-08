@@ -11,15 +11,15 @@ public class PNCounter<T> implements CRDT<PNCounter<T>> {
 	private GCounter<T> decrements = new GCounter<T>();
 
 
-	public void inc(T key) {
+	public void increment(T key) {
 		increments.increment(key);
 	}
 
-	public void dec(T key) {
+	public void decrement(T key) {
 		decrements.increment(key);
 	}
 
-	public int get() {
+	public int value() {
 		return increments.value() - decrements.value();
 	}
 
@@ -36,4 +36,6 @@ public class PNCounter<T> implements CRDT<PNCounter<T>> {
 		PNCounter<T> copy = new PNCounter<T>();
 		copy.increments = increments.copy();
 		copy.decrements = decrements.copy();
+		return copy;
+	}
 }
