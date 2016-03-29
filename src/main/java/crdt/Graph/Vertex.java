@@ -4,8 +4,8 @@ import java.util.HashSet;
 
 public class Vertex {
 
-    private final String name;
-    private final HashSet<Edge> inEdges, outEdges;
+    public final String name;
+    public final HashSet<Edge> inEdges, outEdges;
 
 
     public Vertex(String name) {
