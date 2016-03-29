@@ -14,10 +14,7 @@ import static java.lang.Math.max;
  */
 public class GCounter<T> implements CRDT<GCounter<T>> {
 
-    private static final long serialVersionUID = 1L;
-
     private Map<T, Integer> counts = new HashMap<T, Integer>();
-
 
     /*
     Increment a replica with a given key by 1
@@ -58,6 +55,9 @@ public class GCounter<T> implements CRDT<GCounter<T>> {
                 counts.put(key, e.getValue());
          }
     }
+
+
+
 
     public String toString(){
         return "GCounter{" + counts + "}";
