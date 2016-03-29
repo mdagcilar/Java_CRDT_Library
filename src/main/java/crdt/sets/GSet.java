@@ -23,19 +23,19 @@ public class GSet<T> implements CRDT<GSet<T>> {
     }
 
     /*
-    Merge two CRDT's and return one CRDt.
+    Merge two CRDT's into the current CRDT (set).
     */
     public void merge(GSet<T> set) {
         elements.addAll(set.elements);
     }
 
 //    return true if the set contains the element passed in
-    public boolean contains(T element) {
+    public boolean contains(T element)
+    {
         return elements.contains(element);
     }
 
 
-//    TODO Collection<T>? makes it unique to the <T>?
     public void addAll(Collection<T> addingElement) {
         elements.addAll(addingElement);
     }

@@ -15,8 +15,8 @@ import java.util.Set;
  */
 public class TwoPhaseSet<T> implements CRDT<TwoPhaseSet<T>> {
 
-    private GSet<T> added = new GSet<T>();
-    private GSet<T> removed = new GSet<T>();
+    public GSet<T> added = new GSet<T>();
+    public GSet<T> removed = new GSet<T>();
 
 
     /*
@@ -40,7 +40,7 @@ public class TwoPhaseSet<T> implements CRDT<TwoPhaseSet<T>> {
     /*
         The get method returns a Set containing all the elements in the added set that are not in the removed set.
 
-        Using a LinkedHashSet because it maintainns a linked list of the entries in the set, in the order in which they were inserted.
+        Using a LinkedHashSet because it maintains a linked list of the entries in the set, in the order in which they were inserted.
     */
     public Set<T> get() {
         Set<T> addedSet = new LinkedHashSet<T>( added.get());

@@ -1,6 +1,10 @@
 import crdt.Counters.PNCounter;
 import crdt.sets.TwoPhaseSet;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 /***
  create new CRDT counter type
  increment it in a loop, print out to console.
@@ -13,8 +17,18 @@ public class main {
         main main1 = new main();
         //main1.testingPNCounter();
         main1.testingTwoPhaseSet();
-    }
 
+        Set<String> test = new HashSet<String>();
+
+        test.add("Julia");
+
+        String a = "Julia";
+
+        System.out.println(test.size());
+        test.remove(a);
+        System.out.println(test.size());
+
+    }
 
     /*
     A method for testing the expected output of a PNCounter.
@@ -41,22 +55,32 @@ public class main {
     public void testingTwoPhaseSet()
     {
         TwoPhaseSet<String> replica1 = new TwoPhaseSet<String>();
+        TwoPhaseSet<String> replica2 = new TwoPhaseSet<String>();
 
         replica1.add("a");
         replica1.add("b");
-
-
-        TwoPhaseSet<String> replica2 = replica1.copy();
-        replica2.remove("b");
-        replica2.add("c");
+        replica1.add("c");
 
         replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        System.out.println("**********First**********");
 
         System.out.println("replica1 elements = " + replica1.get());
+        System.out.println("replica2 elements = " + replica2.get());
 
 
+        replica1.remove("b");
 
+        replica2.add("d");
+        replica2.add("e");
 
+        replica2.remove("d");
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+        System.out.println("/n**********Second**********");
+        System.out.println("replica1 elements = " + replica1.get());
+        System.out.println("replica2 elements = " + replica2.get());
     }
-
 }
