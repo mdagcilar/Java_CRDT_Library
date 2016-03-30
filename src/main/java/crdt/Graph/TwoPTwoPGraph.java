@@ -12,6 +12,10 @@ TODO: add sentinels in edge set
  */
 public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
 
+    /**
+     * Each set contains 2 GSets one for added and one for storing removed elements.
+     * We do not need to store removed Edges but we still use a TwoPhaseSet for simplicity
+     */
     private TwoPhaseSet<Vertex> vertices;
     private TwoPhaseSet<Edge> edges;
 
@@ -108,15 +112,36 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
         return "Successfully removed Vertex";
     }
 
-    public TwoPhaseSet<T> get2PSetMinus()
+    /**
+     * Get the Vertices (VA - VR)
+     * Retain VR, EA and ER.
+     * @return The current representation of the Graph, only the correct Vertices & Edges remain
+     */
+    public TwoPTwoPGraph<T> getGraph()
     {
-        TwoPhaseSet<T> twoPhaseSet = new TwoPhaseSet<T>(v)
+        TwoPTwoPGraph<T> twoPTwoPGraph = new TwoPTwoPGraph<T>();
+
+        /**
+         * TODO: Could make use of copy(). Remove all from vertices.added and then re-add with getSetMinus()
+         * twoPTwoPGraph.vertices.added.get().removeAll();
+         */
+        twoPTwoPGraph.vertices.added.addAll(this.vertices.getSetMinus());
+        twoPTwoPGraph.vertices.added.addAll(this.vertices.removed.get());
+        twoPTwoPGraph.edges.added.addAll(this.edges.added.get());
+        twoPTwoPGraph.edges.added.addAll(this.edges.removed.get());
+        return twoPTwoPGraph;
     }
 
+    /**
+     * TODO: Preconditions to check relationships with edges don't break. May need to do something re-adding from removed nodes.
+     * @param graph
+     */
     public void merge(TwoPTwoPGraph<T> graph)
     {
-        vertices.merge(graph.vertices);
-        edges.merge(graph.edges);
+        vertices.added.addAll(graph.vertices.added.get());
+        vertices.removed.addAll(graph.vertices.removed.get());
+        edges.removed.addAll(graph.edges.removed.get());
+        edges.removed.addAll(graph.edges.removed.get());
     }
 
     public TwoPTwoPGraph<T> copy() {

@@ -66,8 +66,8 @@ public class main {
 
         System.out.println("**********First**********");
 
-        System.out.println("replica1 elements = " + replica1.get());
-        System.out.println("replica2 elements = " + replica2.get());
+        System.out.println("replica1 elements = " + replica1.getSetMinus());
+        System.out.println("replica2 elements = " + replica2.getSetMinus());
 
 
         replica1.remove("b");
@@ -80,7 +80,7 @@ public class main {
         replica1.merge(replica2);
         replica2.merge(replica1);
         System.out.println("/n**********Second**********");
-        System.out.println("replica1 elements = " + replica1.get());
-        System.out.println("replica2 elements = " + replica2.get());
+        System.out.println("replica1 elements = " + replica1.getSetMinus());
+        System.out.println("replica2 elements = " + replica2.getSetMinus());
     }
 }

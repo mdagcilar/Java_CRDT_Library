@@ -5,7 +5,7 @@ import crdt.CRDT;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-/*
+/**
     A 2PSet - A set for adding and removing elements in a Set.
     Built on top of the GSet which only allows adding elements.
 
@@ -19,7 +19,7 @@ public class TwoPhaseSet<T> implements CRDT<TwoPhaseSet<T>> {
     public GSet<T> removed = new GSet<T>();
 
 
-    /*
+    /**
         Add an element to the 'added' set. An element can only be added if it isn't in the tombstone 'removed' set.
      */
     public void add(T element) {
@@ -29,7 +29,7 @@ public class TwoPhaseSet<T> implements CRDT<TwoPhaseSet<T>> {
     }
 
 
-    /*
+    /**
         To avoid removing elements that do not exist. We first check that the element is in the 'added' set.
         Then it is added to the tombstone set.
      */
@@ -37,7 +37,7 @@ public class TwoPhaseSet<T> implements CRDT<TwoPhaseSet<T>> {
         if(added.contains(element))
             removed.add(element);
     }
-    /*
+    /**
         The get method returns a Set containing all the elements in the added set that are not in the removed set.
 
         Using a LinkedHashSet because it maintains a linked list of the entries in the set, in the order in which they were inserted.
@@ -48,7 +48,7 @@ public class TwoPhaseSet<T> implements CRDT<TwoPhaseSet<T>> {
         return addedSet;
     }
 
-    /*
+    /**
         Merges the passed in set with the current set.
         1- Merge the GSet that contains all the added elements because Set Union is commutative
         2- Merge the GSet that contains all the removed elements (tombstone set) because again Set Union is commutative
@@ -58,7 +58,8 @@ public class TwoPhaseSet<T> implements CRDT<TwoPhaseSet<T>> {
         removed.addAll(TwoPSet.removed.get());
     }
 
-    /*
+
+    /**
         The copy method creates a new TwoPhaseSet and initialises the two GSets (added and removed)
         by using the copy() methods in the GSet class to clone all the elements.
      */
