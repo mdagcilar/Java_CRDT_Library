@@ -42,7 +42,7 @@ public class TwoPhaseSet<T> implements CRDT<TwoPhaseSet<T>> {
 
         Using a LinkedHashSet because it maintains a linked list of the entries in the set, in the order in which they were inserted.
     */
-    public Set<T> get() {
+    public Set<T> getSetMinus() {
         Set<T> addedSet = new LinkedHashSet<T>( added.get());
         addedSet.removeAll(removed.get() );
         return addedSet;
@@ -53,9 +53,9 @@ public class TwoPhaseSet<T> implements CRDT<TwoPhaseSet<T>> {
         1- Merge the GSet that contains all the added elements because Set Union is commutative
         2- Merge the GSet that contains all the removed elements (tombstone set) because again Set Union is commutative
      */
-    public void merge(TwoPhaseSet<T> set) {
-        added.addAll(set.added.get());
-        removed.addAll(set.removed.get());
+    public void merge(TwoPhaseSet<T> TwoPSet) {
+        added.addAll(TwoPSet.added.get());
+        removed.addAll(TwoPSet.removed.get());
     }
 
     /*

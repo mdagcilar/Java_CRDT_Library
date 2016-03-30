@@ -14,7 +14,8 @@ public class GSet<T> implements CRDT<GSet<T>> {
     private Set<T> elements = new LinkedHashSet<T>();
 
 //    add an element to the set.
-    public void add(T element){
+    public void add(T element)
+    {
         elements.add(element);
     }
 
@@ -22,12 +23,6 @@ public class GSet<T> implements CRDT<GSet<T>> {
         return Collections.unmodifiableSet(elements);
     }
 
-    /*
-    Merge two CRDT's into the current CRDT (set).
-    */
-    public void merge(GSet<T> set) {
-        elements.addAll(set.elements);
-    }
 
 //    return true if the set contains the element passed in
     public boolean contains(T element)
@@ -45,5 +40,12 @@ public class GSet<T> implements CRDT<GSet<T>> {
 
         copy.elements = new LinkedHashSet<T>(elements);
         return copy;
+    }
+
+    /*
+   Merge two CRDT's into the current CRDT (set) by Union which is commutative.
+   */
+    public void merge(GSet<T> set) {
+        elements.addAll(set.elements);
     }
 }

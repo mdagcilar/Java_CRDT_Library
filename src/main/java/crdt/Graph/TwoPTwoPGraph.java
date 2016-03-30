@@ -2,24 +2,18 @@ package crdt.Graph;
 
 import crdt.CRDT;
 import crdt.sets.TwoPhaseSet;
-import javafx.geometry.VerticalDirection;
-import javafx.util.Pair;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
- * - Rid of cycles
- * - Use of sets gets rid of duplicates
- * - Use a relationship between Vertices ( E = V x V )
+TODO: add sentinels in edge set
+ todo: removeVertex method
  */
 public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
 
     private TwoPhaseSet<Vertex> vertices;
     private TwoPhaseSet<Edge> edges;
-
-
-
 
 
     /** @param vertex The Vertex to lookup if it exists.
@@ -41,9 +35,7 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
         return edges.added.contains(edge);
     }
 
-
-
-    /*
+    /**
         Precondition: That vertices u and v exist.
         Perform and lookup on both values and if the lookup returns true.
 
@@ -99,5 +91,39 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
         edges.added.add(edge2);
 
         return "Successfully added node";
+    }
+
+    /**
+     * Removing a Vertex (File or Directory)
+     * @param v Vertex to be removed
+     * @return String message to result the result of the method.
+     */
+    public String removeVertex(Vertex v)
+    {
+        if(!lookupVertex(v)){
+            return "Vertex does not exist - cannot remove a Vertex if it doesn't exist";
+        }
+
+
+        return "Successfully removed Vertex";
+    }
+
+    public TwoPhaseSet<T> get2PSetMinus()
+    {
+        TwoPhaseSet<T> twoPhaseSet = new TwoPhaseSet<T>(v)
+    }
+
+    public void merge(TwoPTwoPGraph<T> graph)
+    {
+        vertices.merge(graph.vertices);
+        edges.merge(graph.edges);
+    }
+
+    public TwoPTwoPGraph<T> copy() {
+        TwoPTwoPGraph<T> copy = new TwoPTwoPGraph<T>();
+
+        copy.vertices = vertices.copy();  //copy() is the GSet's method copy.
+        copy.edges = edges.copy();
+        return copy;
     }
 }
