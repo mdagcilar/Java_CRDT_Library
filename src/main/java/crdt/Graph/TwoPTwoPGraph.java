@@ -7,8 +7,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
-TODO: add sentinels in edge set
- todo: removeVertex method
+ TODO: print tree? pretty print
  */
 public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
 
@@ -18,7 +17,23 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
      */
     private TwoPhaseSet<Vertex> vertices;
     private TwoPhaseSet<Edge> edges;
+    private Vertex startSentinel, endSentinel;
 
+
+    public TwoPTwoPGraph() {
+        vertices = new TwoPhaseSet<Vertex>();
+        edges = new TwoPhaseSet<Edge>();
+
+        /**
+         * Initialize the Vertex set with the sentinels and add the edge between them.
+         */
+        startSentinel = new Vertex("startSentinel");
+        endSentinel = new Vertex("endSentinel");
+        vertices.added.add(startSentinel);
+        vertices.added.add(endSentinel);
+        Edge sentinelEdge = new Edge(startSentinel, endSentinel);
+        edges.added.add(sentinelEdge);
+    }
 
     /** @param vertex The Vertex to lookup if it exists.
      *   Return a boolean value. True if the vertex is in the added set and not in the removed set.
@@ -38,6 +53,7 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
     {
         return edges.added.contains(edge);
     }
+
 
     /**
         Precondition: That vertices u and v exist.
@@ -60,25 +76,30 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
     public String addBetweenVertex(Vertex u, Vertex v, Vertex w) {
         //Checks if u is in the Vertex Set
         if (!lookupVertex(u)) {
-            return "Invalid add - First node u does not exist";
+            return "Precondition failed - First node u does not exist";
         }
         //Checks if w is in the Vertex Set
         if (!lookupVertex(w)) {
-            return "Invalid add - Third node w does not exist";
+            return "Precondition failed - Third node w does not exist";
         }
         //Checks if v is a unique new Vertex
         if (lookupVertex(v)) {
-            return "Invalid add - Second node v already exists, cannot add duplicates";
+            return "Precondition failed - Second node v already exists, cannot add duplicates";
         }
 
         if (!u.outEdges.contains(w)) {
-            return "Invalid add - Nodes u and w are more than 1 level apart in the tree";
+            return "Precondition failed - Nodes u and w are more than 1 level apart in the tree";
         }
 
+        /**
+         * downstream
+         * - remove the initial edge between u and w
+         * - add the new edge to each node
+         * - add the new Vertex
+         * - add the new edges to the EA set
+         * return success message to the user
+         */
 
-        //downstream
-
-        //remove the initial edge between u and w
         Edge e1 = new Edge(u, w);
         u.outEdges.remove(e1);
         w.inEdges.remove(e1);
@@ -98,17 +119,22 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
     }
 
     /**
-     * Removing a Vertex (File or Directory)
+     * Removing a Vertex (File or Directory) has the same effect. The sub branch of the tree below
+     * will be removed because we do not distinguish between Files and Directories. This is to simplify
+     * the problem, and can be introduced later to handle this problem.
      * @param v Vertex to be removed
      * @return String message to result the result of the method.
      */
     public String removeVertex(Vertex v)
     {
         if(!lookupVertex(v)){
-            return "Vertex does not exist - cannot remove a Vertex if it doesn't exist";
+            return "Precondition failed - Vertex does not exist, cannot remove a Vertex if it does not exist";
         }
-
-
+        // check if 'v' is the sentinels
+        if(v == startSentinel || v == endSentinel){
+            return "Precondition failed - Cannot remove start or end Sentinel";
+        }
+        vertices.removed.add(v);
         return "Successfully removed Vertex";
     }
 
@@ -134,6 +160,7 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
 
     /**
      * TODO: Preconditions to check relationships with edges don't break. May need to do something re-adding from removed nodes.
+     * Apply Set Union on each GSet in the 2Pset
      * @param graph
      */
     public void merge(TwoPTwoPGraph<T> graph)
