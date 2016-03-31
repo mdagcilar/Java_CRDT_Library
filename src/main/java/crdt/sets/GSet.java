@@ -17,18 +17,6 @@ public class GSet<T> implements CRDT<GSet<T>> {
     }
 
 
-    @Override
-    public boolean equals(Object o) {
-        if(this == o)
-            return true;
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.toString().hashCode();
-    }
-
     //    add an element to the set.
     public void add(T element)
     {
@@ -63,6 +51,7 @@ public class GSet<T> implements CRDT<GSet<T>> {
         return nameList.get(index);
     }
 
+    //TODO: remove method
     public void printLinkedHashSet()
     {
         Iterator<T> itr = elements.iterator();
