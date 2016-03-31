@@ -13,4 +13,10 @@ public class Edge {
         Edge e = (Edge)obj;
         return e.from == from && e.to == to;
     }
+
+    @Override
+    public String toString() {
+        return (this.from.toString() + " - " + this.to.toString());
+    }
+
 }
