@@ -24,4 +24,16 @@ public class Vertex {
     public String toString() {
         return name;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if(this.toString().equals(o.toString()))
+            return true;
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.toString().hashCode();
+    }
 }
