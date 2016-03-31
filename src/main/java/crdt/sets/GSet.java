@@ -57,7 +57,7 @@ public class GSet<T> implements CRDT<GSet<T>> {
         Iterator<T> itr = elements.iterator();
         while(itr.hasNext()){
             T t = itr.next();
-            System.out.println(t + " Hashcode " + t.hashCode());
+            System.out.println(t);
         }
     }
 }

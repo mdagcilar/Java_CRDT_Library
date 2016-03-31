@@ -94,33 +94,10 @@ public class main {
         TwoPTwoPGraph<String> replica2 = new TwoPTwoPGraph<String>();
 
         System.out.println("Vertices of replica 1 added: " + replica1.vertices.added.get());
-        System.out.println("Hashcodes of replica 1 added: " + replica1.vertices.added.getElement(0).toString().hashCode() + " second : " + replica1.vertices.added.getElement(1).toString().hashCode());
 
         System.out.println("\nVertices of replica 2 added: " + replica2.vertices.added.get());
-        System.out.println("Hashcodes of replica 2 added: " + replica2.vertices.added.getElement(0).toString().hashCode() + " second : " + replica2.vertices.added.getElement(1).toString().hashCode());
-
-
-        System.out.println(replica1.getStartSentinel());
-        System.out.println(replica2.getStartSentinel());
-
-        System.out.println(replica1.getEndSentinel());
-        System.out.println(replica2.getEndSentinel());
-
-        System.out.println(replica1.getStartSentinel().hashCode());
-        System.out.println(replica2.getStartSentinel().hashCode());
-
-        System.out.println(replica1.getEndSentinel().hashCode());
-        System.out.println(replica2.getEndSentinel().hashCode());
-
-        System.out.println(replica1.getStartSentinel().toString().hashCode());
-        System.out.println(replica2.getStartSentinel().toString().hashCode());
-
-        System.out.println(replica1.getEndSentinel().toString().hashCode());
-        System.out.println(replica2.getEndSentinel().toString().hashCode());
 
         System.out.println("\nare they equal?**************: " + replica1.getStartSentinel().equals(replica2.getStartSentinel()) + "\n");
-
-
 
         replica1.merge(replica2);
         System.out.println("\nmerge:");
@@ -130,7 +107,7 @@ public class main {
 
         //trying to add a new Vertex 'v' between the start and end sentinels
         Vertex v = new Vertex("v");
-        replica1.addBetweenVertex(replica1.getStartSentinel(), v, replica1.getEndSentinel());
+        //replica1.addBetweenVertex(replica1.getStartSentinel(), v, replica1.getEndSentinel());
         System.out.println((replica1.addBetweenVertex(replica1.getStartSentinel(), v, replica1.getEndSentinel())));
 
         System.out.println("\nmerge:");

@@ -3,6 +3,8 @@ package crdt.Graph;
 import crdt.CRDT;
 import crdt.sets.TwoPhaseSet;
 
+import java.util.Iterator;
+
 
 /**
  TODO: print tree? pretty print
@@ -78,6 +80,9 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
      */
     public String addBetweenVertex(Vertex u, Vertex v, Vertex w) {
         //Checks if u is in the Vertex Set
+        System.out.println("Printing sets before addBetweenVertex\n");
+        vertices.added.getElement(0).inEdges.size();
+        vertices.added.getElement(0).outEdges.size();
         if (!lookupVertex(u)) {
             return "Precondition failed - First node u does not exist";
         }
@@ -90,7 +95,7 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
             return "Precondition failed - Second node v already exists, cannot add duplicates";
         }
 
-        if (!u.outEdges.contains(w)) {
+        if (!edges.added.contains(new Edge(u, w))) {
 //            System.out.println(u.inEdges.size());
 //            System.out.println(u.outEdges.size());
 //            System.out.println(w.inEdges.size());
@@ -194,4 +199,6 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
         copy.edges = edges.copy();
         return copy;
     }
+
+
 }
