@@ -87,6 +87,7 @@ public class main {
         System.out.println("replica2 elements = " + replica2.getSetMinus());
     }
 
+
     public void testingGraph()
     {
         TwoPTwoPGraph<String> replica1 = new TwoPTwoPGraph<String>();
@@ -98,27 +99,41 @@ public class main {
         System.out.println("\nVertices of replica 2 added: " + replica2.vertices.added.get());
         System.out.println("Hashcodes of replica 2 added: " + replica2.vertices.added.getElement(0).toString().hashCode() + " second : " + replica2.vertices.added.getElement(1).toString().hashCode());
 
-        System.out.println("\nare they equal?**************: " + replica1.getStartSentinel().equals(replica2.getStartSentinel()) + "\n");
+
+        System.out.println(replica1.getStartSentinel());
+        System.out.println(replica2.getStartSentinel());
+
+        System.out.println(replica1.getEndSentinel());
+        System.out.println(replica2.getEndSentinel());
+
+        System.out.println(replica1.getStartSentinel().hashCode());
+        System.out.println(replica2.getStartSentinel().hashCode());
+
+        System.out.println(replica1.getEndSentinel().hashCode());
+        System.out.println(replica2.getEndSentinel().hashCode());
 
         System.out.println(replica1.getStartSentinel().toString().hashCode());
         System.out.println(replica2.getStartSentinel().toString().hashCode());
-        System.out.println(replica1.getStartSentinel().toString());
-        System.out.println(replica2.getStartSentinel().toString());
-        System.out.println(replica2.getStartSentinel().hashCode());
-        System.out.println(replica2.getStartSentinel().hashCode());
 
+        System.out.println(replica1.getEndSentinel().toString().hashCode());
+        System.out.println(replica2.getEndSentinel().toString().hashCode());
+
+        System.out.println("\nare they equal?**************: " + replica1.getStartSentinel().equals(replica2.getStartSentinel()) + "\n");
 
 
 
         replica1.merge(replica2);
-        System.out.println("\nAfter merge: added and removed sets:");
+        System.out.println("\nmerge:");
         System.out.println("Vertices: " + replica1.getGraph().vertices.added.get());
         System.out.println("Edges: " + replica1.getGraph().edges.added.get());
         System.out.println("\n");
 
+        //trying to add a new Vertex 'v' between the start and end sentinels
         Vertex v = new Vertex("v");
         replica1.addBetweenVertex(replica1.getStartSentinel(), v, replica1.getEndSentinel());
         System.out.println((replica1.addBetweenVertex(replica1.getStartSentinel(), v, replica1.getEndSentinel())));
+
+        System.out.println("\nmerge:");
 
         System.out.println(replica1.getGraph().vertices.added.get());
         System.out.println(replica1.getGraph().edges.added.get());

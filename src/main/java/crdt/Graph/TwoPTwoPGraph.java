@@ -30,8 +30,8 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
         endSentinel = new Vertex("endSentinel");
         vertices.added.add(startSentinel);
         vertices.added.add(endSentinel);
-        Edge sentinelEdge = new Edge(startSentinel, endSentinel);
-        edges.added.add(sentinelEdge);
+        Edge initSentinelEdge = new Edge(startSentinel, endSentinel);
+        edges.added.add(initSentinelEdge);
 //        System.out.println(startSentinel.inEdges.size());
 //        System.out.println(startSentinel.outEdges.size());
 //        System.out.println(endSentinel.inEdges.size());
@@ -90,7 +90,7 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
             return "Precondition failed - Second node v already exists, cannot add duplicates";
         }
 
-        if (!u.inEdges.contains(w)) {
+        if (!u.outEdges.contains(w)) {
 //            System.out.println(u.inEdges.size());
 //            System.out.println(u.outEdges.size());
 //            System.out.println(w.inEdges.size());
