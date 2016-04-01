@@ -106,9 +106,11 @@ public class main {
         System.out.println("\n");
 
         //trying to add a new Vertex 'v' between the start and end sentinels
-        Vertex v = new Vertex("v");
+        Vertex k = new Vertex("k");
+        Vertex m = new Vertex("m");
         //replica1.addBetweenVertex(replica1.getStartSentinel(), v, replica1.getEndSentinel());
-        System.out.println((replica1.addBetweenVertex(replica1.getStartSentinel(), v, replica1.getEndSentinel())));
+        System.out.println((replica1.addBetweenVertex(replica1.getStartSentinel(), k, replica1.getEndSentinel())));
+        System.out.println((replica1.addBetweenVertex(k, m, replica1.getEndSentinel())));
 
         System.out.println("\nmerge:");
 

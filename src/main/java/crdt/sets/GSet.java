@@ -2,6 +2,7 @@ package crdt.sets;
 
 
 import crdt.CRDT;
+import crdt.Graph.Vertex;
 
 import java.util.*;
 

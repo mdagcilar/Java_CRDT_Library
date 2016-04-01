@@ -28,7 +28,6 @@ public class TwoPhaseSet<T> implements CRDT<TwoPhaseSet<T>> {
         added.add(element);
     }
 
-
     /**
         To avoid removing elements that do not exist. We first check that the element is in the 'added' set.
         Then it is added to the tombstone set.

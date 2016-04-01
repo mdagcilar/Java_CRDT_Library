@@ -7,8 +7,10 @@ import java.util.Iterator;
 
 
 /**
- TODO: print tree? pretty print
- TODO: unique elements
+ TODO: print tree pretty print
+ TODO: remove vertex should re-attaach an edge
+ TODO: should you be able to permanently remove an Edge?
+ TODO: concurrent add || remove fix
  */
 public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
 
@@ -94,12 +96,7 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
         if (lookupVertex(v)) {
             return "Precondition failed - Second node v already exists, cannot add duplicates";
         }
-
         if (!edges.added.contains(new Edge(u, w))) {
-//            System.out.println(u.inEdges.size());
-//            System.out.println(u.outEdges.size());
-//            System.out.println(w.inEdges.size());
-//            System.out.println(w.outEdges.size());
             return "Precondition failed - Nodes u and w are more than 1 level apart in the tree";
         }
 
