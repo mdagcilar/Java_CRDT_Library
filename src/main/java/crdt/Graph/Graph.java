@@ -76,7 +76,6 @@ public class Graph<T> implements CRDT<Graph<T>> {
      */
     public String addBetweenVertex(Vertex u, Vertex v, Vertex w) {
         //Checks if u is in the Vertex Set
-        System.out.println("Printing sets before addBetweenVertex\n");
         vertices.added.getElement(0).inEdges.size();
         vertices.added.getElement(0).outEdges.size();
         if (!lookupVertex(u)) {
