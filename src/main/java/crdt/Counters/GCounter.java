@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 
 import static java.lang.Math.max;
 
-/*
+/**
     A state-based Counter that can only increment. Can be used as a building block
     for more complex data structures like PN (positive-negative) counters.
  */
@@ -16,7 +16,7 @@ public class GCounter<T> implements CRDT<GCounter<T>> {
 
     private Map<T, Integer> counts = new HashMap<T, Integer>();
 
-    /*
+    /**
     Increment a replica with a given key by 1
      */
     public void increment(T key){
@@ -29,7 +29,7 @@ public class GCounter<T> implements CRDT<GCounter<T>> {
         counts.put(key, count + 1);
     }
 
-    /*
+    /**
     Query the counter value. Use a int sum to total the values.
      */
     public int value(){
@@ -40,7 +40,7 @@ public class GCounter<T> implements CRDT<GCounter<T>> {
         return sum;
     }
 
-    /*
+    /**
     Merge two CRDT's and return one CRDt.
 
     Hashmap.entrySet() is a method used to get a Set view of the mappings contained in the current map.
@@ -57,14 +57,11 @@ public class GCounter<T> implements CRDT<GCounter<T>> {
     }
 
 
-
-
     public String toString(){
         return "GCounter{" + counts + "}";
     }
 
-//    TODO is this necessary?
-    /*
+    /**
     Creates a copy of the current GCounter CRDT and
      */
     public GCounter<T> copy() {

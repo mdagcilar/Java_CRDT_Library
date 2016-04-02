@@ -1,12 +1,10 @@
+package crdt;
+
 import crdt.Counters.PNCounter;
 import crdt.Graph.TwoPTwoPGraph;
 import crdt.Graph.Vertex;
 import crdt.sets.GSet;
 import crdt.sets.TwoPhaseSet;
-
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 /***
  create new CRDT counter type
