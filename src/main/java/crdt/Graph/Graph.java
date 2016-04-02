@@ -3,8 +3,6 @@ package crdt.Graph;
 import crdt.CRDT;
 import crdt.sets.TwoPhaseSet;
 
-import java.util.Iterator;
-
 
 /**
  TODO: print tree pretty print
@@ -12,18 +10,18 @@ import java.util.Iterator;
  TODO: should you be able to permanently remove an Edge?
  TODO: concurrent add || remove fix
  */
-public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
+public class Graph<T> implements CRDT<Graph<T>> {
 
     /**
      * Each set contains 2 GSets one for added and one for storing removed elements.
-     * We do not need to store removed Edges but we still use a TwoPhaseSet for simplicity
+     * We do not need to store removed Edges but we still use a TwoPhaseSet for simplicity and consistency.
      */
     public TwoPhaseSet<Vertex> vertices;
     public TwoPhaseSet<Edge> edges;
     public Vertex startSentinel, endSentinel;
 
 
-    public TwoPTwoPGraph() {
+    public Graph() {
         vertices = new TwoPhaseSet<Vertex>();
         edges = new TwoPhaseSet<Edge>();
 
@@ -36,10 +34,6 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
         vertices.added.add(endSentinel);
         Edge initSentinelEdge = new Edge(startSentinel, endSentinel);
         edges.added.add(initSentinelEdge);
-//        System.out.println(startSentinel.inEdges.size());
-//        System.out.println(startSentinel.outEdges.size());
-//        System.out.println(endSentinel.inEdges.size());
-//        System.out.println(endSentinel.outEdges.size());
     }
 
     /** @param vertex The Vertex to lookup if it exists.
@@ -156,32 +150,34 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
         return endSentinel;
     }
 
+
     /**
      * Get the Vertices (VA - VR)
      * Retain VR, EA and ER.
      * @return The current representation of the Graph, only the correct Vertices & Edges remain
      */
-    public TwoPTwoPGraph<T> getGraph()
+    public Graph<T> getGraph()
     {
-        TwoPTwoPGraph<T> twoPTwoPGraph = new TwoPTwoPGraph<T>();
+        Graph<T> graph = new Graph<T>();
 
         /**
          * TODO: Could make use of copy(). Remove all from vertices.added and then re-add with getSetMinus()
-         * twoPTwoPGraph.vertices.added.get().removeAll();
+         * graph.vertices.added.get().removeAll();
          */
-        twoPTwoPGraph.vertices.added.addAll(this.vertices.added.get());
-        twoPTwoPGraph.vertices.added.addAll(this.vertices.removed.get());
-        twoPTwoPGraph.edges.added.addAll(this.edges.added.get());
-        twoPTwoPGraph.edges.added.addAll(this.edges.removed.get());
-        return twoPTwoPGraph;
+        graph.vertices.added.addAll(this.vertices.added.get());
+        graph.vertices.added.addAll(this.vertices.removed.get());
+        graph.edges.added.addAll(this.edges.added.get());
+        graph.edges.added.addAll(this.edges.removed.get());
+        return graph;
     }
+
 
     /**
      * TODO: Preconditions to check relationships with edges don't break. May need to do something re-adding from removed nodes.
      * Apply Set Union on each GSet in the 2Pset
      * @param graph
      */
-    public void merge(TwoPTwoPGraph<T> graph)
+    public void merge(Graph<T> graph)
     {
         this.vertices.added.addAll(graph.vertices.added.get());
         this.vertices.removed.addAll(graph.vertices.removed.get());
@@ -189,13 +185,12 @@ public class TwoPTwoPGraph<T> implements CRDT<TwoPTwoPGraph<T>> {
         this.edges.removed.addAll(graph.edges.removed.get());
     }
 
-    public TwoPTwoPGraph<T> copy() {
-        TwoPTwoPGraph<T> copy = new TwoPTwoPGraph<T>();
+
+    public Graph<T> copy() {
+        Graph<T> copy = new Graph<T>();
 
         copy.vertices = vertices.copy();  //copy() is the GSet's method copy.
         copy.edges = edges.copy();
         return copy;
     }
-
-
 }
