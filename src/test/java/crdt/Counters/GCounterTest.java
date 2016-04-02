@@ -4,9 +4,6 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-/**
- * Created by Metin on 02/04/2016.
- */
 public class GCounterTest {
 
     @Test

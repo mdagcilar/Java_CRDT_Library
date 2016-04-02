@@ -2,9 +2,6 @@ package crdt.Counters;
 
 import crdt.CRDT;
 
-/**
- * Created by Metin on 25/02/2016.
- */
 public class PNCounter<T> implements CRDT<PNCounter<T>> {
 
 	private GCounter<T> increments = new GCounter<T>();
@@ -24,7 +21,7 @@ public class PNCounter<T> implements CRDT<PNCounter<T>> {
 	}
 
 
-	/*
+	/**
     Merge two CRDT's and return one CRDt.
     */
 	public void merge(PNCounter<T> otherReplica){
