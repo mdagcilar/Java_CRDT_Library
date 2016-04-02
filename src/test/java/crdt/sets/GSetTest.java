@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import static com.google.common.collect.Sets.newHashSet;
 
-import static com.google.common.collect.Sets.newHashSetWithExpectedSize;
 import static org.junit.Assert.*;
 
 
