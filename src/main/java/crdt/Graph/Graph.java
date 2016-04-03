@@ -4,6 +4,7 @@ import crdt.CRDT;
 import crdt.sets.TwoPhaseSet;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -12,6 +13,7 @@ import java.util.Set;
  TODO: remove vertex should re-attaach an edge
  TODO: should you be able to permanently remove an Edge?
  TODO: concurrent add || remove fix
+ TODO: change constructor to init method so getGraph() and co
  */
 public class Graph<T> implements CRDT<Graph<T>> {
 
@@ -23,11 +25,12 @@ public class Graph<T> implements CRDT<Graph<T>> {
     public Set<Edge> edges;
     public Vertex startSentinel, endSentinel;
 
-
-    public Graph() {
+    /**
+     * initialize the graph with start and end sentinels. Ensures acyclicity by the addBetween method.
+     */
+    public void initGraph(){
         vertices = new TwoPhaseSet<Vertex>();
         edges = new HashSet<Edge>();
-
 
         //Initialize the Vertex set with the sentinels and add the edge between them.
         startSentinel = new Vertex("startSentinel");
@@ -96,6 +99,7 @@ public class Graph<T> implements CRDT<Graph<T>> {
         u.outEdges.remove(e1);
         w.inEdges.remove(e1);
 
+        edges.remove(e1);
 
         u.addEdge(v);
         v.addEdge(w);
@@ -149,16 +153,7 @@ public class Graph<T> implements CRDT<Graph<T>> {
     public Graph<T> getGraph()
     {
         Graph<T> graph = new Graph<T>();
-
-        /**
-         * TODO: Could make use of copy(). Remove all from vertices.added and then re-add with getSetMinus()
-         * graph.vertices.added.get().removeAll();
-         */
-        graph.vertices.added.addAll(this.vertices.added.get());
-        graph.vertices.added.addAll(this.vertices.removed.get());
-        graph.edges.addAll(this.edges);
-        graph.edges.addAll(this.edges);
-        return graph;
+        return graph.copy();
     }
 
 
@@ -178,7 +173,7 @@ public class Graph<T> implements CRDT<Graph<T>> {
     public Graph<T> copy() {
         Graph<T> copy = new Graph<T>();
 
-        copy.vertices = this.vertices.copy();  //copy() is the GSet's method copy.
+        copy.vertices = this.vertices;
         copy.edges = this.edges;
         return copy;
     }
