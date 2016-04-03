@@ -3,6 +3,9 @@ package crdt.Graph;
 import crdt.CRDT;
 import crdt.sets.TwoPhaseSet;
 
+import java.util.HashSet;
+import java.util.Set;
+
 
 /**
  TODO: print tree pretty print
@@ -17,23 +20,22 @@ public class Graph<T> implements CRDT<Graph<T>> {
      * We do not need to store removed Edges but we still use a TwoPhaseSet for simplicity and consistency.
      */
     public TwoPhaseSet<Vertex> vertices;
-    public TwoPhaseSet<Edge> edges;
+    public Set<Edge> edges;
     public Vertex startSentinel, endSentinel;
 
 
     public Graph() {
         vertices = new TwoPhaseSet<Vertex>();
-        edges = new TwoPhaseSet<Edge>();
+        edges = new HashSet<Edge>();
 
-        /**
-         * Initialize the Vertex set with the sentinels and add the edge between them.
-         */
+
+        //Initialize the Vertex set with the sentinels and add the edge between them.
         startSentinel = new Vertex("startSentinel");
         endSentinel = new Vertex("endSentinel");
         vertices.added.add(startSentinel);
         vertices.added.add(endSentinel);
         Edge initSentinelEdge = new Edge(startSentinel, endSentinel);
-        edges.added.add(initSentinelEdge);
+        edges.add(initSentinelEdge);
     }
 
     /** @param vertex The Vertex to lookup if it exists.
@@ -46,38 +48,27 @@ public class Graph<T> implements CRDT<Graph<T>> {
 
 
     /** @param edge The edge to make a lookup on
-     *  Return true iff
-    - v and u are both in the vertex added set and not in the removed vertex set.
-    - v and u are both in the edge set and not in the removed edge set
      */
     public boolean lookupEdge(Edge edge)
     {
-        return edges.added.contains(edge);
+        return edges.contains(edge);
     }
 
 
     /**
-        Precondition: That vertices u and v exist.
-        Perform and lookup on both values and if the lookup returns true.
-
-        Precondition: To ensure acyclicity some form of local properties must be enforced.
-                      Otherwise a counter-example would be a concurrent addEdge (u, v) || addEdge(v, u) -> these two operations
-                      make the graph cyclic!
-                 Fix; An edge may be added only if it oriented in the same direction as an existing path. That is, the new edge can
-                      only strength the partial order defined by the DAG. The DAG must be initialised with left and right
-                      sentinels |- and -| and edge(|-, -|). The only operation for adding a vertex is addBetween in order
-                      to maintain the DAG property. The first operation must be addBetween(|-, -|).
-
-                      This is a CRDT because addEdge(addBetween) either concern different edges (respect to vertices) in which can
-                      they are independent. Or the same edge (with respect to vertices), in which can the execution is idempotent (duplicate delivery doesn't matter)
-
-                      precondition: Need to perform some check that ensures (u, v, w) that u is before w, so v can be added between. (u, v) & (v, w)
-                 Fix; Check that the second node w is in the 'outEdges' Hashset of u.
+     * Precondition: That vertices u and w exist.
+     * Precondition: That 'v' the Vertex to be added between is unique; Not already in the vertices added set, and not in the removed set.
+     *
+     * Precondition: To ensure acyclicity some form of local properties must be enforced.
+     * Otherwise a counter-example would be a concurrent addEdge (u, v) || addEdge(v, u) -> these two operations make the graph cyclic.
+     *
+     * The Graph must be initialised with left and right sentinels '|-' and '-|' and edge(|-, -|).
+     * The only operation for adding a vertex is addBetween in order to maintain the acyclicity property. The first operation must be addBetween(|-, -|).
+     * This is a CRDT because addEdge(addBetween) is either concerned with different edges (respect to vertices) in which can
+     * they are independent. Or the same edge (with respect to vertices), in which case the execution is idempotent (duplicate delivery doesn't matter)
      */
     public String addBetweenVertex(Vertex u, Vertex v, Vertex w) {
         //Checks if u is in the Vertex Set
-        vertices.added.getElement(0).inEdges.size();
-        vertices.added.getElement(0).outEdges.size();
         if (!lookupVertex(u)) {
             return "Precondition failed - First node u does not exist";
         }
@@ -89,7 +80,7 @@ public class Graph<T> implements CRDT<Graph<T>> {
         if (lookupVertex(v)) {
             return "Precondition failed - Second node v already exists, cannot add duplicates";
         }
-        if (!edges.added.contains(new Edge(u, w))) {
+        if (!edges.contains(new Edge(u, w))) {
             return "Precondition failed - Nodes u and w are more than 1 level apart in the tree";
         }
 
@@ -99,12 +90,12 @@ public class Graph<T> implements CRDT<Graph<T>> {
          * - add the new edge to each node
          * - add the new Vertex
          * - add the new edges to the EA set
-         * return success message to the user
          */
 
         Edge e1 = new Edge(u, w);
         u.outEdges.remove(e1);
         w.inEdges.remove(e1);
+
 
         u.addEdge(v);
         v.addEdge(w);
@@ -114,8 +105,8 @@ public class Graph<T> implements CRDT<Graph<T>> {
         //add edges from u to v and v to w
         Edge edge1 = new Edge(u, v);
         Edge edge2 = new Edge(v, w);
-        edges.added.add(edge1);
-        edges.added.add(edge2);
+        edges.add(edge1);
+        edges.add(edge2);
 
         return "Successfully added node";
     }
@@ -165,8 +156,8 @@ public class Graph<T> implements CRDT<Graph<T>> {
          */
         graph.vertices.added.addAll(this.vertices.added.get());
         graph.vertices.added.addAll(this.vertices.removed.get());
-        graph.edges.added.addAll(this.edges.added.get());
-        graph.edges.added.addAll(this.edges.removed.get());
+        graph.edges.addAll(this.edges);
+        graph.edges.addAll(this.edges);
         return graph;
     }
 
@@ -180,16 +171,15 @@ public class Graph<T> implements CRDT<Graph<T>> {
     {
         this.vertices.added.addAll(graph.vertices.added.get());
         this.vertices.removed.addAll(graph.vertices.removed.get());
-        this.edges.removed.addAll(graph.edges.removed.get());
-        this.edges.removed.addAll(graph.edges.removed.get());
+        this.edges.addAll(graph.edges);
     }
 
 
     public Graph<T> copy() {
         Graph<T> copy = new Graph<T>();
 
-        copy.vertices = vertices.copy();  //copy() is the GSet's method copy.
-        copy.edges = edges.copy();
+        copy.vertices = this.vertices.copy();  //copy() is the GSet's method copy.
+        copy.edges = this.edges;
         return copy;
     }
 }
