@@ -129,25 +129,37 @@ public class GraphTest {
         replica1.initGraph();
         Edge edge1 = new Edge(startSentinel, endSentinel);
 
-        assertEquals( newHashSet(startSentinel, endSentinel), replica1.copy().vertices.added.get());
-        assertEquals( newHashSet(), replica1.copy().vertices.removed.get());
+        assertEquals(newHashSet(startSentinel, endSentinel), replica1.copy().vertices.added.get());
+        assertEquals(newHashSet(), replica1.copy().vertices.removed.get());
         assertEquals( newHashSet(edge1), replica1.copy().edges);
 
     }
 
     @Test
-    public void testLookupVertex() throws Exception {
+    public void testLookupVertex_true() throws Exception {
         replica1.initGraph();
 
         Vertex v = new Vertex("v");
-
         replica1.vertices.added.add(v);
 
         assertTrue(replica1.lookupVertex(v));
     }
 
+    /**
+     * Creating a Vertex, never adding it. Should return false.
+     */
     @Test
-    public void testLookupEdge() throws Exception {
+    public void testLookupVertex_false() throws Exception {
+        replica1.initGraph();
+
+
+        Vertex v = new Vertex("v");
+
+        assertFalse(replica1.lookupVertex(v));
+    }
+
+    @Test
+    public void testLookupEdge_true() throws Exception {
         replica1.initGraph();
 
         Vertex v = new Vertex("v");
@@ -158,6 +170,22 @@ public class GraphTest {
         replica1.edges.add(edge1);
 
         assertTrue(replica1.lookupEdge(edge1));
+    }
+
+    /**
+     *Creating an Edge, never adding it. Should return false
+     */
+    @Test
+    public void testLookupEdge_false() throws Exception {
+        replica1.initGraph();
+
+        Vertex v = new Vertex("v");
+        Vertex u = new Vertex("u");
+
+        Edge edge1 = new Edge(v, u);
+
+        //replica1.edges.add(edge1);
+        assertFalse(replica1.lookupEdge(edge1));
     }
 
     @Test

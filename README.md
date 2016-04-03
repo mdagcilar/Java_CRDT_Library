@@ -11,9 +11,14 @@ CRDTs are used to replicate data across multiple computers in a network, executi
 This would lead to merge conflicts in systems using conventional eventual consistency technology, but CRDTs are designed such that conflicts are mathematically impossible.
 Under the constraints of the CAP theorem they provide the strongest consistency guarantees for available/partition-tolerant (AP) settings.
 
+#The following CRDTs are implemented in this library
+GCounter
+PNCounter
+GSet
+TwoPhaseSet
+Graph
+
 #State-based vs Operation-based
-
-
 
 #Counter (State-based) G-Counter
 A state-based counter is not as straightforward as one would expect. To simplify the problem, we start with a Counter that only increments.
