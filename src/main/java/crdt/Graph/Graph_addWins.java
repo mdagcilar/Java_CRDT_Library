@@ -1,11 +1,8 @@
 package crdt.Graph;
 
 import crdt.CRDT;
-import crdt.sets.TwoPhaseSet;
 
-import javax.xml.stream.events.EndDocument;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 
@@ -15,13 +12,13 @@ import java.util.Set;
  TODO: concurrent add || remove fix
  TODO: addwins - how can we remove a Vertex
  */
-public class Graph<T> implements CRDT<Graph<T>> {
+public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
 
     /**
      * Each set contains 2 GSets one for added and one for storing removed elements.
      * We do not need to store removed Edges but we still use a TwoPhaseSet for simplicity and consistency.
      */
-    public TwoPhaseSet<Vertex> vertices;
+    public Set<Vertex> verticesAdded, verticesRemoved;
     public Set<Edge> edges;
     public Vertex startSentinel, endSentinel;
 
@@ -30,14 +27,15 @@ public class Graph<T> implements CRDT<Graph<T>> {
      * initialize the graph with start and end sentinels. Ensures acyclicity by the addBetween method.
      */
     public void initGraph(){
-        vertices = new TwoPhaseSet<Vertex>();
+        verticesAdded = new HashSet<Vertex>();
+        verticesRemoved = new HashSet<Vertex>();
         edges = new HashSet<Edge>();
 
         //Initialize the Vertex set with the sentinels and add the edge between them.
         startSentinel = new Vertex("startSentinel");
         endSentinel = new Vertex("endSentinel");
-        vertices.added.add(startSentinel);
-        vertices.added.add(endSentinel);
+        verticesAdded.add(startSentinel);
+        verticesAdded.add(endSentinel);
         Edge initSentinelEdge = new Edge(startSentinel, endSentinel);
         edges.add(initSentinelEdge);
     }
@@ -47,7 +45,7 @@ public class Graph<T> implements CRDT<Graph<T>> {
      **/
     public boolean lookupVertex(Vertex vertex)
     {
-        return vertices.added.contains(vertex) && !vertices.removed.contains(vertex);
+        return verticesAdded.contains(vertex) && !verticesRemoved.contains(vertex);
     }
 
 
@@ -102,7 +100,7 @@ public class Graph<T> implements CRDT<Graph<T>> {
         if(!edge.equals(new Edge(startSentinel, endSentinel))){
             edges.remove(edge);
         }
-        vertices.added.add(v);
+        verticesAdded.add(v);
 
         //add edges from u to v and v to w
         Edge edge1 = new Edge(u, v);
@@ -131,7 +129,7 @@ public class Graph<T> implements CRDT<Graph<T>> {
         if(v == startSentinel || v == endSentinel){
             return "Precondition failed - Cannot remove start or end Sentinel";
         }
-        vertices.removed.add(v);
+        verticesRemoved.add(v);
         return "Successfully removed Vertex";
     }
 
@@ -150,9 +148,9 @@ public class Graph<T> implements CRDT<Graph<T>> {
      * Retain VR, EA and ER.
      * @return The current representation of the Graph, only the correct Vertices & Edges remain
      */
-    public Graph<T> getGraph()
+    public Graph_addWins<T> getGraph()
     {
-        Graph<T> graph = new Graph<T>().copy();
+        Graph_addWins<T> graph = new Graph_addWins<T>().copy();
 
 
         return graph;
@@ -164,18 +162,19 @@ public class Graph<T> implements CRDT<Graph<T>> {
      * Apply Set Union on each GSet in the 2Pset
      * @param graph
      */
-    public void merge(Graph<T> graph)
+    public void merge(Graph_addWins<T> graph)
     {
-        this.vertices.added.addAll(graph.vertices.added.get());
-        this.vertices.removed.addAll(graph.vertices.removed.get());
+        this.verticesAdded.addAll(graph.verticesAdded);
+        this.verticesRemoved.addAll(graph.verticesRemoved);
         this.edges.addAll(graph.edges);
     }
 
 
-    public Graph<T> copy() {
-        Graph<T> copy = new Graph<T>();
+    public Graph_addWins<T> copy() {
+        Graph_addWins<T> copy = new Graph_addWins<T>();
 
-        copy.vertices = this.vertices;
+        copy.verticesAdded = this.verticesAdded;
+        copy.verticesRemoved = this.verticesRemoved;
         copy.edges = this.edges;
         return copy;
     }
