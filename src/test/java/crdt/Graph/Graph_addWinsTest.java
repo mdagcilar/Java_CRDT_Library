@@ -47,7 +47,7 @@ public class Graph_addWinsTest {
         Edge edge1 = new Edge(startSentinel, k);
         Edge edge2 = new Edge(k, endSentinel);
 
-        assertEquals(newHashSet(edge, edge1, edge2), replica1.edges);
+        assertEquals(newHashSet(edge, edge1, edge2), replica1.edgesAdded);
     }
 
     @Test
@@ -57,7 +57,7 @@ public class Graph_addWinsTest {
         Edge edge = new Edge(startSentinel, endSentinel);
 
         assertEquals(newHashSet(startSentinel, endSentinel), replica1.verticesAdded);
-        assertEquals(newHashSet(edge), replica1.edges);
+        assertEquals(newHashSet(edge), replica1.edgesAdded);
 
         Vertex a = new Vertex("a");
         Vertex b = new Vertex("b");
@@ -65,18 +65,17 @@ public class Graph_addWinsTest {
         Vertex d = new Vertex("d");
         Vertex e = new Vertex("e");
 
-        System.out.println(replica1.addBetweenVertex(startSentinel, a, endSentinel));
-        System.out.println(replica1.addBetweenVertex(a, b, endSentinel));
-        System.out.println(replica1.addBetweenVertex(a, c, endSentinel));
-        System.out.println(replica1.addBetweenVertex(b, d, endSentinel));
-        System.out.println(replica1.addBetweenVertex(c, e, endSentinel));
+        replica1.addBetweenVertex(startSentinel, a, endSentinel);
+        replica1.addBetweenVertex(a, b, endSentinel);
+        replica1.addBetweenVertex(a, c, endSentinel);
+        replica1.addBetweenVertex(b, d, endSentinel);
+        replica1.addBetweenVertex(c, e, endSentinel);
 
-        System.out.println(replica1.removeVertex(a));
         replica1.removeVertex(a);
 
-        System.out.println("dfgdfgdgfgdf" + replica1.getGraph().verticesAdded);
         assertEquals( newHashSet(startSentinel, endSentinel), replica1.getGraph().verticesAdded);
-        assertEquals( newHashSet(edge), replica1.getGraph().edges);
+        assertEquals( newHashSet(edge), replica1.getGraph().edgesAdded);
+
     }
 
     @Test
@@ -153,7 +152,8 @@ public class Graph_addWinsTest {
         //test all sets within the graph are equal. Vertices added/Vertices removed/Edges added/Edges removed
         assertTrue(replica1.verticesAdded.equals(replica2.verticesAdded));
         assertTrue(replica1.verticesRemoved.equals(replica2.verticesRemoved));
-        assertTrue(replica1.edges.equals(replica2.edges));
+        assertTrue(replica1.edgesAdded.equals(replica2.edgesAdded));
+        assertTrue(replica1.edgesRemoved.equals(replica2.edgesRemoved));
     }
 
     @Test
@@ -167,9 +167,10 @@ public class Graph_addWinsTest {
 
         replica1.addBetweenVertex(startSentinel, v, endSentinel);
 
-        assertEquals(newHashSet(startSentinel, v, endSentinel), replica1.copy().verticesAdded);
-        assertEquals(newHashSet(), replica1.copy().verticesRemoved);
-        assertEquals( newHashSet(edge1, edge2, edge3), replica1.copy().edges);
+        assertEquals( newHashSet(startSentinel, v, endSentinel), replica1.copy().verticesAdded);
+        assertEquals( newHashSet(), replica1.copy().verticesRemoved);
+        assertEquals( newHashSet(edge1, edge2, edge3), replica1.copy().edgesAdded);
+        assertEquals( newHashSet(), replica1.copy().edgesRemoved);
 
     }
 
@@ -205,7 +206,7 @@ public class Graph_addWinsTest {
 
         Edge edge1 = new Edge(v, u);
 
-        replica1.edges.add(edge1);
+        replica1.edgesAdded.add(edge1);
 
         assertTrue(replica1.lookupEdge(edge1));
     }
