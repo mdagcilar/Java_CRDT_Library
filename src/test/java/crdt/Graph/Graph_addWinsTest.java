@@ -68,8 +68,10 @@ public class Graph_addWinsTest {
 
         replica1.removeVertex(a);
 
-        //assertEquals( newHashSet(startSentinel, endSentinel), replica1.getGraph().verticesAdded);
-        assertEquals( newHashSet(edge), replica1.getGraph().edgesAdded);
+        System.out.println(replica1.verticesAdded);
+        System.out.println(replica1.verticesRemoved);
+        assertEquals( newHashSet(startSentinel, endSentinel), replica1.getGraph().verticesAdded);
+        //assertEquals( newHashSet(edge), replica1.getGraph().edgesAdded);
 
     }
 

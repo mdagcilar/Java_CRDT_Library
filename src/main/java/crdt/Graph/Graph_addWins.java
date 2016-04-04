@@ -8,11 +8,7 @@ import java.util.Set;
 
 /**
  TODO: print tree pretty print
- TODO: remove vertex should re-attaach an edge
- TODO: concurrent add || remove fix
- TODO: addwins - revert removes
- TODO: removeVertex - must remove all the vertexes below itself.
- TODO: Store removed Edges?
+ TODO: concurrent add || remove fix - need to in merge method addwins concept
  */
 public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
 
@@ -129,13 +125,11 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
      */
     public String removeVertex(Vertex v)
     {
-        System.out.println("outedges " + v + " vertex:" + v.outEdges);
-        System.out.println("inedges " + v + " vertex:" + v.inEdges);
         if(!lookupVertex(v)){
             return "Precondition failed - Vertex does not exist, cannot remove a Vertex if it does not exist";
         }
         // check if 'v' is either of the sentinels
-        if(v == startSentinel || v == endSentinel){
+        if((v.equals(startSentinel)) || (v.equals(endSentinel))){
             return "Precondition failed - Cannot remove start or end Sentinel";
         }
 
@@ -149,6 +143,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
          *  in position - as long as the edge is not the startSentinel - endSentinel, remove that edge. (the edge
          *  directly above the removed Vertex).
          */
+
         verticesRemoved.add(v);
         edgesRemoved.add(new Edge(v, endSentinel));
         v.outEdges.remove(new Edge(v, endSentinel));
@@ -167,7 +162,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
                 v.inEdges.remove(e);
 
                 //if a Vertex has an edge to this Vertex, remove it from it's edge and let the Vertex stay in the Vertex Set.
-                if(!(e.from == startSentinel)){
+                if(!(e.from.equals(startSentinel))){
                     e.from.outEdges.remove(e);
                 }
             }
