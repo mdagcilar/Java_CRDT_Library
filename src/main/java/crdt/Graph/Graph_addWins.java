@@ -139,43 +139,39 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
             return "Precondition failed - Cannot remove start or end Sentinel";
         }
 
-        /**
-         * If the Vertex to be removed is one level above the endSentinel.
+        /** Vertex should be remove. Could have sub vertex that also need to be removed.
          * 1 - Add that Vertex to the removed Vertices set.
          * 2 - Add the Edge between v and the endSentinel to the remove edge set.
-         * 3 - re-route the edges that pointed to v to the endSentinel. This edge is already in the set
-         *     so remove anything point to 'v' those Vertex's will already be pointing to the end and
-         *     any other Vertex's that they have edges with.
+         * 3 - Check all the edges in the added edge set if they contain 'v' as a 'from' or a 'to'
+         *  edge. If an edge exists with the removed vertex 'v' in the 'from' position of an edge.
+         *
+         *  from position - Remove that edge and recursively remove the Vertex in the 'to' position.
+         *  in position - as long as the edge is not the startSentinel - endSentinel, remove that edge. (the edge
+         *  directly above the removed Vertex).
          */
-        if(edgesAdded.contains(new Edge(v, endSentinel))){
-            verticesRemoved.add(v);
-            edgesRemoved.add(new Edge(v, endSentinel));
-            v.outEdges.remove(new Edge(v, endSentinel));
+        verticesRemoved.add(v);
+        edgesRemoved.add(new Edge(v, endSentinel));
+        v.outEdges.remove(new Edge(v, endSentinel));
 
-            //any edge with v in it's 'to' or 'from' position; remove that edge.
-            for(Edge e : edgesAdded){
-                if(e.to.equals(v)){
-                    edgesRemoved.add(e);
-                    v.inEdges.remove(e);
-                }else if(e.from.equals(v)){
-                    edgesRemoved.add(e);
-                    v.outEdges.remove(e);
+        //any edge with v in it's 'to' or 'from' position; remove that edge and vertex.
+        for(Edge e : edgesAdded){
+            if(e.from.equals(v)){
+                edgesRemoved.add(e);
+                v.outEdges.remove(e);
 
+                //recursively remove the node below.
+                removeVertex(e.to);
+            //prevents removal of the 'start and end' sentinel.
+            }else if((e.to.equals(v)) && !(e.equals(new Edge(startSentinel, endSentinel)))){
+                edgesRemoved.add(e);
+                v.inEdges.remove(e);
+
+                //if a Vertex has an edge to this Vertex, remove it from it's edge and let the Vertex stay in the Vertex Set.
+                if(!(e.from == startSentinel)){
+                    e.from.outEdges.remove(e);
                 }
-                /**
-                 * Each node only have one parent. If an inEdge is removed. Then it's vertex must also be removed.
-                 */
             }
         }
-
-
-        System.out.println("outedges " + v + " vertex:" + v.outEdges);
-        System.out.println("inedges " + v + " vertex:" + v.inEdges);
-        /**
-         * If the Vertex to be removed has Vertex's below it. We must remove all of them.
-         * 1 -
-         */
-
         return "Successfully removed Vertex";
     }
 
