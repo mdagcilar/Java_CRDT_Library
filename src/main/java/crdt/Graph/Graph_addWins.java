@@ -11,6 +11,7 @@ import java.util.Set;
  TODO: remove vertex should re-attaach an edge
  TODO: concurrent add || remove fix
  TODO: addwins - how can we remove a Vertex
+ TODO: removeVertex - must remove all the vertexes below itself.
  */
 public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
 
@@ -97,7 +98,11 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         u.outEdges.remove(edge);
         w.inEdges.remove(edge);
 
-        if(!edge.equals(new Edge(startSentinel, endSentinel))){
+        /**
+         * Prevents removal of the edge that is from the start and end sentinel and any edge that points to the end.
+         * This allows Vertexs to have multiple children.
+         */
+        if(!edge.to.equals(endSentinel)){
             edges.remove(edge);
         }
         verticesAdded.add(v);
@@ -125,7 +130,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         if(!lookupVertex(v)){
             return "Precondition failed - Vertex does not exist, cannot remove a Vertex if it does not exist";
         }
-        // check if 'v' is the sentinels
+        // check if 'v' is either of the sentinels
         if(v == startSentinel || v == endSentinel){
             return "Precondition failed - Cannot remove start or end Sentinel";
         }
@@ -150,10 +155,8 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
      */
     public Graph_addWins<T> getGraph()
     {
-        Graph_addWins<T> graph = new Graph_addWins<T>().copy();
-
-
-        return graph;
+        this.verticesAdded.removeAll(verticesRemoved);
+        return this;
     }
 
 
