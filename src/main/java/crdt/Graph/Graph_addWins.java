@@ -129,6 +129,8 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
      */
     public String removeVertex(Vertex v)
     {
+        System.out.println("outedges " + v + " vertex:" + v.outEdges);
+        System.out.println("inedges " + v + " vertex:" + v.inEdges);
         if(!lookupVertex(v)){
             return "Precondition failed - Vertex does not exist, cannot remove a Vertex if it does not exist";
         }
@@ -148,13 +150,27 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         if(edgesAdded.contains(new Edge(v, endSentinel))){
             verticesRemoved.add(v);
             edgesRemoved.add(new Edge(v, endSentinel));
-            //does an edge exist with v as it's 'to' Vertex.
+            v.outEdges.remove(new Edge(v, endSentinel));
+
+            //any edge with v in it's 'to' or 'from' position; remove that edge.
             for(Edge e : edgesAdded){
-                if(e.to.equals(v))
+                if(e.to.equals(v)){
                     edgesRemoved.add(e);
+                    v.inEdges.remove(e);
+                }else if(e.from.equals(v)){
+                    edgesRemoved.add(e);
+                    v.outEdges.remove(e);
+
+                }
+                /**
+                 * Each node only have one parent. If an inEdge is removed. Then it's vertex must also be removed.
+                 */
             }
         }
 
+
+        System.out.println("outedges " + v + " vertex:" + v.outEdges);
+        System.out.println("inedges " + v + " vertex:" + v.inEdges);
         /**
          * If the Vertex to be removed has Vertex's below it. We must remove all of them.
          * 1 -

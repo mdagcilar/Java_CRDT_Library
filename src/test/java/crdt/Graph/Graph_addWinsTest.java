@@ -51,7 +51,7 @@ public class Graph_addWinsTest {
         assertEquals(newHashSet(edge, edge1, edge2), replica1.edgesAdded);
     }
 
-    @Ignore
+    @Test
     public void testRemoveVertex_entireSubtree() throws Exception {
         replica1.initGraph();
 
@@ -61,34 +61,30 @@ public class Graph_addWinsTest {
         Vertex a = new Vertex("a");
         Vertex b = new Vertex("b");
         Vertex c = new Vertex("c");
-        Vertex d = new Vertex("d");
-        Vertex e = new Vertex("e");
 
         replica1.addBetweenVertex(startSentinel, a, endSentinel);
         replica1.addBetweenVertex(a, b, endSentinel);
-        replica1.addBetweenVertex(a, c, endSentinel);
-        replica1.addBetweenVertex(b, d, endSentinel);
-        replica1.addBetweenVertex(c, e, endSentinel);
+        replica1.addBetweenVertex(b, c, endSentinel);
 
         replica1.removeVertex(a);
 
-        assertEquals( newHashSet(startSentinel, endSentinel), replica1.getGraph().verticesAdded);
+        //assertEquals( newHashSet(startSentinel, endSentinel), replica1.getGraph().verticesAdded);
         assertEquals( newHashSet(edge), replica1.getGraph().edgesAdded);
 
     }
 
-    @Test
+    @Ignore
     public void testRemoveEdge_OnelevelAboveEndSentinel() throws Exception {
         replica1.initGraph();
 
-        Vertex v = new Vertex("v");
-        Vertex x = new Vertex("x");
-        replica1.addBetweenVertex(startSentinel, v, endSentinel);
-        replica1.addBetweenVertex(startSentinel, x, endSentinel);
-        replica1.removeVertex(v);
+        Vertex a = new Vertex("a");
+        Vertex b = new Vertex("b");
+        replica1.addBetweenVertex(startSentinel, a, endSentinel);
+        replica1.addBetweenVertex(a, b, endSentinel);
+        replica1.removeVertex(b);
 
-        assertEquals( newHashSet(startSentinel, endSentinel, x), replica1.getGraph().verticesAdded);
-        assertEquals( newHashSet(edge, new Edge(startSentinel, x), new Edge(x, endSentinel)), replica1.getGraph().edgesAdded);
+        assertEquals( newHashSet(startSentinel, endSentinel, a), replica1.getGraph().verticesAdded);
+        assertEquals( newHashSet(edge, new Edge(startSentinel, a), new Edge(a, endSentinel)), replica1.getGraph().edgesAdded);
     }
 
 
