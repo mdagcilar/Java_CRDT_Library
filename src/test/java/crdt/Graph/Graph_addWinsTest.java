@@ -51,8 +51,32 @@ public class Graph_addWinsTest {
     }
 
     @Test
-    public void testRemoveVertex() throws Exception {
+    public void testRemoveVertex_entireSubtree() throws Exception {
+        replica1.initGraph();
 
+        Edge edge = new Edge(startSentinel, endSentinel);
+
+        assertEquals(newHashSet(startSentinel, endSentinel), replica1.verticesAdded);
+        assertEquals(newHashSet(edge), replica1.edges);
+
+        Vertex a = new Vertex("a");
+        Vertex b = new Vertex("b");
+        Vertex c = new Vertex("c");
+        Vertex d = new Vertex("d");
+        Vertex e = new Vertex("e");
+
+        System.out.println(replica1.addBetweenVertex(startSentinel, a, endSentinel));
+        System.out.println(replica1.addBetweenVertex(a, b, endSentinel));
+        System.out.println(replica1.addBetweenVertex(a, c, endSentinel));
+        System.out.println(replica1.addBetweenVertex(b, d, endSentinel));
+        System.out.println(replica1.addBetweenVertex(c, e, endSentinel));
+
+        System.out.println(replica1.removeVertex(a));
+        replica1.removeVertex(a);
+
+        System.out.println("dfgdfgdgfgdf" + replica1.getGraph().verticesAdded);
+        assertEquals( newHashSet(startSentinel, endSentinel), replica1.getGraph().verticesAdded);
+        assertEquals( newHashSet(edge), replica1.getGraph().edges);
     }
 
     @Test
@@ -63,7 +87,24 @@ public class Graph_addWinsTest {
 
     @Test
     public void testGetGraph() throws Exception {
+        replica1.initGraph();
 
+        Vertex a = new Vertex("a");
+        Vertex b = new Vertex("b");
+        Vertex c = new Vertex("c");
+
+        replica1.verticesAdded.add(a);
+        replica1.verticesAdded.add(b);
+        replica1.verticesAdded.add(c);
+        replica1.verticesRemoved.add(c);
+
+
+        assertEquals(newHashSet(startSentinel, endSentinel, a , b, c), replica1.verticesAdded);
+        assertEquals(newHashSet(c), replica1.verticesRemoved);
+
+        //calling getGraph c should not be in the verticesAdded set.
+        assertEquals(newHashSet(startSentinel, endSentinel, a , b), replica1.getGraph().verticesAdded);
+        assertEquals(newHashSet(c), replica1.getGraph().verticesRemoved);
     }
 
     @Test
@@ -118,11 +159,17 @@ public class Graph_addWinsTest {
     @Test
     public void testCopy() throws Exception {
         replica1.initGraph();
-        Edge edge1 = new Edge(startSentinel, endSentinel);
+        Vertex v = new Vertex("v");
 
-        assertEquals(newHashSet(startSentinel, endSentinel), replica1.copy().verticesAdded);
+        Edge edge1 = new Edge(startSentinel, endSentinel);
+        Edge edge2 = new Edge(startSentinel, v);
+        Edge edge3 = new Edge(v, endSentinel);
+
+        replica1.addBetweenVertex(startSentinel, v, endSentinel);
+
+        assertEquals(newHashSet(startSentinel, v, endSentinel), replica1.copy().verticesAdded);
         assertEquals(newHashSet(), replica1.copy().verticesRemoved);
-        assertEquals( newHashSet(edge1), replica1.copy().edges);
+        assertEquals( newHashSet(edge1, edge2, edge3), replica1.copy().edges);
 
     }
 
