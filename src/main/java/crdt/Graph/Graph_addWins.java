@@ -139,12 +139,20 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
 
         /**
          * If the Vertex to be removed is one level above the endSentinel.
-         * 1 - Add that Vertex to the removed set.
-         * 2 - remove the edge between v and End
-         * 3 - re-route the edge that was before v to the endSentinel
+         * 1 - Add that Vertex to the removed Vertices set.
+         * 2 - Add the Edge between v and the endSentinel to the remove edge set.
+         * 3 - re-route the edges that pointed to v to the endSentinel. This edge is already in the set
+         *     so remove anything point to 'v' those Vertex's will already be pointing to the end and
+         *     any other Vertex's that they have edges with.
          */
         if(edgesAdded.contains(new Edge(v, endSentinel))){
             verticesRemoved.add(v);
+            edgesRemoved.add(new Edge(v, endSentinel));
+            //does an edge exist with v as it's 'to' Vertex.
+            for(Edge e : edgesAdded){
+                if(e.to.equals(v))
+                    edgesRemoved.add(e);
+            }
         }
 
         /**
@@ -152,7 +160,6 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
          * 1 -
          */
 
-        verticesRemoved.add(v);
         return "Successfully removed Vertex";
     }
 

@@ -1,5 +1,6 @@
 package crdt.Graph;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -16,6 +17,7 @@ public class Graph_addWinsTest {
     Vertex startSentinel = new Vertex("startSentinel");
     Vertex endSentinel = new Vertex("endSentinel");
 
+    Edge edge = new Edge(startSentinel, endSentinel);
 
     /**
      * Check if the constructor added the sentinels.
@@ -43,18 +45,15 @@ public class Graph_addWinsTest {
         assertEquals(newHashSet(startSentinel, endSentinel, k), replica1.verticesAdded);
 
         //check the edges
-        Edge edge = new Edge(startSentinel, endSentinel);
         Edge edge1 = new Edge(startSentinel, k);
         Edge edge2 = new Edge(k, endSentinel);
 
         assertEquals(newHashSet(edge, edge1, edge2), replica1.edgesAdded);
     }
 
-    @Test
+    @Ignore
     public void testRemoveVertex_entireSubtree() throws Exception {
         replica1.initGraph();
-
-        Edge edge = new Edge(startSentinel, endSentinel);
 
         assertEquals(newHashSet(startSentinel, endSentinel), replica1.verticesAdded);
         assertEquals(newHashSet(edge), replica1.edgesAdded);
@@ -79,8 +78,17 @@ public class Graph_addWinsTest {
     }
 
     @Test
-    public void testRemoveEdge() throws Exception {
+    public void testRemoveEdge_OnelevelAboveEndSentinel() throws Exception {
+        replica1.initGraph();
 
+        Vertex v = new Vertex("v");
+        Vertex x = new Vertex("x");
+        replica1.addBetweenVertex(startSentinel, v, endSentinel);
+        replica1.addBetweenVertex(startSentinel, x, endSentinel);
+        replica1.removeVertex(v);
+
+        assertEquals( newHashSet(startSentinel, endSentinel, x), replica1.getGraph().verticesAdded);
+        assertEquals( newHashSet(edge, new Edge(startSentinel, x), new Edge(x, endSentinel)), replica1.getGraph().edgesAdded);
     }
 
 

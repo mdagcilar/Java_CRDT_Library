@@ -2,8 +2,8 @@ package crdt.Graph;
 
 public class Edge {
 
-    public final Vertex from;
-    public final Vertex to;
+    public Vertex from;
+    public Vertex to;
     public Edge(Vertex from, Vertex to) {
         this.from = from;
         this.to = to;
