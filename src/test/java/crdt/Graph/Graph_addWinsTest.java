@@ -17,6 +17,13 @@ public class Graph_addWinsTest {
     Vertex startSentinel = new Vertex("startSentinel");
     Vertex endSentinel = new Vertex("endSentinel");
 
+    Vertex a = new Vertex("a");
+    Vertex b = new Vertex("b");
+    Vertex c = new Vertex("c");
+    Vertex d = new Vertex("d");
+    Vertex e = new Vertex("e");
+    Vertex f = new Vertex("f");
+
     Edge edge = new Edge(startSentinel, endSentinel);
 
     /**
@@ -25,8 +32,6 @@ public class Graph_addWinsTest {
     @Test
     public void testInitGraph_AddedSentinels() throws Exception {
         replica1.initGraph();
-
-        assertEquals(newHashSet("startSentinel", "endSentinel"), replica1.verticesAdded);
         assertEquals(newHashSet(startSentinel, endSentinel), replica1.verticesAdded);
     }
 
@@ -51,6 +56,10 @@ public class Graph_addWinsTest {
         assertEquals(newHashSet(edge, edge1, edge2), replica1.edgesAdded);
     }
 
+    /**
+     * This test attempts to remove an entire subtree of Vertexes including and below 'a'
+     * Ensuring that all Edges between nodes are successfully remove, and vertices.
+     */
     @Test
     public void testRemoveVertex_entireSubtree() throws Exception {
         replica1.initGraph();
@@ -58,24 +67,19 @@ public class Graph_addWinsTest {
         assertEquals(newHashSet(startSentinel, endSentinel), replica1.verticesAdded);
         assertEquals(newHashSet(edge), replica1.edgesAdded);
 
-        Vertex a = new Vertex("a");
-        Vertex b = new Vertex("b");
-        Vertex c = new Vertex("c");
-
         replica1.addBetweenVertex(startSentinel, a, endSentinel);
         replica1.addBetweenVertex(a, b, endSentinel);
-        replica1.addBetweenVertex(b, c, endSentinel);
+        replica1.addBetweenVertex(a, c, endSentinel);
+        replica1.addBetweenVertex(b, d, endSentinel);
+        replica1.addBetweenVertex(c, e, endSentinel);
 
         replica1.removeVertex(a);
 
-        System.out.println(replica1.verticesAdded);
-        System.out.println(replica1.verticesRemoved);
         assertEquals( newHashSet(startSentinel, endSentinel), replica1.getGraph().verticesAdded);
-        //assertEquals( newHashSet(edge), replica1.getGraph().edgesAdded);
-
+        assertEquals( newHashSet(edge), replica1.getGraph().edgesAdded);
     }
 
-    @Ignore
+    @Test
     public void testRemoveEdge_OnelevelAboveEndSentinel() throws Exception {
         replica1.initGraph();
 
@@ -88,6 +92,122 @@ public class Graph_addWinsTest {
         assertEquals( newHashSet(startSentinel, endSentinel, a), replica1.getGraph().verticesAdded);
         assertEquals( newHashSet(edge, new Edge(startSentinel, a), new Edge(a, endSentinel)), replica1.getGraph().edgesAdded);
     }
+
+    /**
+     * Simple Merge test to see if two graphs can merge together to represent the same Edges and Vertices.
+     */
+    @Test
+    public void testMerge_simpleNoConflicts() throws Exception {
+        replica1.initGraph();
+        replica2.initGraph();
+
+
+        replica1.addBetweenVertex(startSentinel, a, replica1.getEndSentinel());
+        replica1.addBetweenVertex(a, b, replica1.getEndSentinel());
+
+        replica2.addBetweenVertex(startSentinel, c, replica2.getEndSentinel());
+        replica2.addBetweenVertex(c, d, replica2.getEndSentinel());
+        replica2.addBetweenVertex(c, e, replica2.getEndSentinel());
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        assertEquals(newHashSet(startSentinel, endSentinel, a, b, c, d, e), replica1.getGraph().verticesAdded);
+        assertEquals( newHashSet(edge,
+                new Edge(startSentinel, a), new Edge(a, b), new Edge(b, endSentinel),
+                new Edge(startSentinel, c), new Edge(c, d), new Edge(c, e), new Edge(d, endSentinel), new Edge(e, endSentinel),
+                new Edge(a, endSentinel), new Edge(c, endSentinel)),
+                replica1.getGraph().edgesAdded);
+
+        assertEquals(newHashSet(startSentinel, endSentinel, a, b, c, d, e), replica2.getGraph().verticesAdded);
+        assertEquals( newHashSet(edge,
+                new Edge(startSentinel, a), new Edge(a, b), new Edge(b, endSentinel),
+                new Edge(startSentinel, c), new Edge(c, d), new Edge(c, e), new Edge(d, endSentinel), new Edge(e, endSentinel),
+                new Edge(a, endSentinel), new Edge(c, endSentinel)),
+                replica2.getGraph().edgesAdded);
+    }
+
+    /**
+     * Simple test to check if Graphs can converge after one of them removes a sub-tree.
+     */
+    @Test
+    public void testMerge_withRemoveVertex_noConflict() throws Exception {
+        replica1.initGraph();
+        replica2.initGraph();
+
+        replica1.addBetweenVertex(startSentinel, a, replica1.getEndSentinel());
+        replica1.addBetweenVertex(a, b, replica1.getEndSentinel());
+
+        replica2.addBetweenVertex(startSentinel, c, replica2.getEndSentinel());
+        replica2.addBetweenVertex(c, d, replica2.getEndSentinel());
+        replica2.addBetweenVertex(c, e, replica2.getEndSentinel());
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        replica1.removeVertex(c);
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        assertEquals(newHashSet(startSentinel, endSentinel, a, b), replica1.getGraph().verticesAdded);
+        assertEquals( newHashSet(edge,
+                new Edge(startSentinel, a), new Edge(a, b), new Edge(b, endSentinel),
+                new Edge(a, endSentinel)),
+                replica1.getGraph().edgesAdded);
+
+        assertEquals(newHashSet(startSentinel, endSentinel, a, b), replica2.getGraph().verticesAdded);
+        assertEquals( newHashSet(edge,
+                new Edge(startSentinel, a), new Edge(a, b), new Edge(b, endSentinel),
+                new Edge(a, endSentinel)),
+                replica2.getGraph().edgesAdded);
+    }
+
+
+    /**
+     * Conflict_1. A user adds a vertex using the (addBetween method) and a another user removes a vertex that exists in
+     * that add method. Imagine a user adding a file under a directory that has just been deleted. Clearly you cannot
+     * add something that to a path if a sub section of the start of the path does not exist.
+     * Our concept of a Graph gives precedence to the addBetween method. And should automatically resolve this conflict
+     * by re-adding the Vertices and Edges removed by 'removeVertex' so that the add can succeed.
+     */
+    @Test
+    public void testMerge_conflict_1() throws Exception {
+        replica1.initGraph();
+        replica2.initGraph();
+
+        replica1.addBetweenVertex(startSentinel, a, replica1.getEndSentinel());
+        replica1.addBetweenVertex(a, b, replica1.getEndSentinel());
+
+        replica2.addBetweenVertex(startSentinel, c, replica2.getEndSentinel());
+        replica2.addBetweenVertex(c, d, replica2.getEndSentinel());
+        replica2.addBetweenVertex(c, e, replica2.getEndSentinel());
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        replica1.removeVertex(c);
+        replica2.addBetweenVertex(d, f, endSentinel);
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        assertEquals(newHashSet(startSentinel, endSentinel, a, b, c, d, e, f), replica1.getGraph().verticesAdded);
+        assertEquals( newHashSet(edge,
+                        new Edge(startSentinel, a), new Edge(a, b), new Edge(b, endSentinel),
+                        new Edge(startSentinel, c), new Edge(c, d), new Edge(c, e), new Edge(d, f), new Edge(d, endSentinel), new Edge(e, endSentinel), new Edge(f, endSentinel),
+                        new Edge(a, endSentinel), new Edge(c, endSentinel)),
+                replica1.getGraph().edgesAdded);
+
+        assertEquals(newHashSet(startSentinel, endSentinel, a, b, c, d, e, f), replica2.getGraph().verticesAdded);
+        assertEquals( newHashSet(edge,
+                        new Edge(startSentinel, a), new Edge(a, b), new Edge(b, endSentinel),
+                        new Edge(startSentinel, c), new Edge(c, d), new Edge(c, e), new Edge(d, f), new Edge(d, endSentinel), new Edge(e, endSentinel), new Edge(f, endSentinel),
+                        new Edge(a, endSentinel), new Edge(c, endSentinel)),
+                replica2.getGraph().edgesAdded);
+    }
+
+
 
 
     @Test
@@ -112,6 +232,7 @@ public class Graph_addWinsTest {
         assertEquals(newHashSet(c), replica1.getGraph().verticesRemoved);
     }
 
+
     @Test
     public void testMerge_noDuplicateSentinels() throws Exception {
         replica1.initGraph();
@@ -123,21 +244,6 @@ public class Graph_addWinsTest {
         assertEquals(newHashSet(startSentinel, endSentinel), replica2.verticesAdded);
     }
 
-    @Test
-    public void testMerge() throws Exception {
-        replica1.initGraph();
-        replica2.initGraph();
-
-        //trying to add a new Vertex 'k' between the start and end sentinels
-        Vertex k = new Vertex("k");
-        Vertex m = new Vertex("m");
-
-        replica1.addBetweenVertex(replica1.getStartSentinel(), k, replica1.getEndSentinel());
-
-
-        replica1.addBetweenVertex(k, m, replica1.getEndSentinel());
-
-    }
 
     @Test
     public void testInitialization(){

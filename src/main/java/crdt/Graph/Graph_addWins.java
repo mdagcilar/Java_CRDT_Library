@@ -5,16 +5,16 @@ import crdt.CRDT;
 import java.util.HashSet;
 import java.util.Set;
 
-
 /**
  TODO: print tree pretty print
  TODO: concurrent add || remove fix - need to in merge method addwins concept
  */
+
+
 public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
 
-    /**
-     * Each set contains 2 GSets one for added and one for storing removed elements.
-     * We do not need to store removed Edges but we still use a TwoPhaseSet for simplicity and consistency.
+    /** Each set contains 2 GSets one for added and one for storing removed elements.
+     *  We do not need to store removed Edges but we still use a TwoPhaseSet for simplicity and consistency.
      */
     public Set<Vertex> verticesAdded, verticesRemoved;
     public Set<Edge> edgesAdded, edgesRemoved;
@@ -39,19 +39,19 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         edgesAdded.add(initSentinelEdge);
     }
 
-    /** @param vertex The Vertex to lookup if it exists.
-     *   Return a boolean value. True if the vertex is in the added set and not in the removed set.
-     **/
-    public boolean lookupVertex(Vertex vertex)
+    public Vertex getStartSentinel() { return startSentinel; }
+    public Vertex getEndSentinel()
     {
-        return verticesAdded.contains(vertex) && !verticesRemoved.contains(vertex);
+        return endSentinel;
     }
 
+    /** @param vertex The Vertex to lookup if it exists.
+     *   Return a boolean value. True if the vertex is in the added set and not in the removed set.**/
+    public boolean lookupVertex(Vertex vertex) {
+        return verticesAdded.contains(vertex) && !verticesRemoved.contains(vertex); }
 
-    /** @param edge The edge to make a lookup on
-     */
-    public boolean lookupEdge(Edge edge)
-    {
+    /** @param edge The edge to make a lookup on */
+    public boolean lookupEdge(Edge edge) {
         return edgesAdded.contains(edge) && !edgesRemoved.contains(edge);
     }
 
@@ -116,6 +116,8 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         return "Successfully added node";
     }
 
+
+
     /**
      * Removing a Vertex (File or Directory) has the same effect. The sub branch of the tree below
      * will be removed because we do not distinguish between Files and Directories. This is to simplify
@@ -161,7 +163,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
                 edgesRemoved.add(e);
                 v.inEdges.remove(e);
 
-                //if a Vertex has an edge to this Vertex, remove it from it's edge and let the Vertex stay in the Vertex Set.
+                //if a Vertex has an edge to this Vertex, remove it from it's edge and let the Vertex stay in the Vertex Set\.
                 if(!(e.from.equals(startSentinel))){
                     e.from.outEdges.remove(e);
                 }
@@ -170,14 +172,20 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         return "Successfully removed Vertex";
     }
 
-    public Vertex getStartSentinel()
+    /**
+     * TODO: Preconditions to check relationships with edges don't break. May need to do something re-adding from removed nodes.
+     *
+     *
+     * @param graph
+     */
+    public void merge(Graph_addWins<T> graph)
     {
-        return startSentinel;
+        this.verticesAdded.addAll(graph.verticesAdded);
+        this.verticesRemoved.addAll(graph.verticesRemoved);
+        this.edgesAdded.addAll(graph.edgesAdded);
+        this.edgesRemoved.addAll(graph.edgesRemoved);
     }
-    public Vertex getEndSentinel()
-    {
-        return endSentinel;
-    }
+
 
 
     /**
@@ -192,21 +200,8 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         return this;
     }
 
-
     /**
-     * TODO: Preconditions to check relationships with edges don't break. May need to do something re-adding from removed nodes.
-     * Apply Set Union on each GSet in the 2Pset
-     * @param graph
-     */
-    public void merge(Graph_addWins<T> graph)
-    {
-        this.verticesAdded.addAll(graph.verticesAdded);
-        this.verticesRemoved.addAll(graph.verticesRemoved);
-        this.edgesAdded.addAll(graph.edgesAdded);
-        this.edgesRemoved.addAll(graph.edgesRemoved);
-    }
-
-
+     * Make a copy of this.graph */
     public Graph_addWins<T> copy() {
         Graph_addWins<T> copy = new Graph_addWins<T>();
 
@@ -214,6 +209,6 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         copy.verticesRemoved = this.verticesRemoved;
         copy.edgesAdded = this.edgesAdded;
         copy.edgesRemoved = this.edgesRemoved;
-        return copy;
+        return this.getGraph();
     }
 }
