@@ -3,6 +3,7 @@ package crdt.Graph;
 import crdt.CRDT;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -173,19 +174,35 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
     }
 
     /**
-     * TODO: Preconditions to check relationships with edges don't break. May need to do something re-adding from removed nodes.
+     * 1- Concurrent addBetweenVertex and removeVertex causes a conflict. Resolve this by:
+     *    1- Is there an Edge in the edgesRemoved set which a new Vertex 'x' relies on.
      *
      *
      * @param graph
      */
     public void merge(Graph_addWins<T> graph)
     {
+        // Make a copy of the 'removed' Vertices so the for loop can iteratively remove a Vertex within the loop
+        // without throwing a ConcurrentModificationException
+        Set<Vertex> verticesRemovedCopy = new HashSet<Vertex>();
+        verticesRemovedCopy.addAll(verticesRemoved);
+
+        /**
+         * TODO: How do you identify when a Vertex has been added as a Vertex has been removed. Then re-add removed vertices & edges
+         */
+        for(Edge e : graph.edgesAdded){
+            for(Vertex v : verticesRemovedCopy){
+                    if(e.from.equals(v)){
+                        verticesRemoved.remove(v);
+                    }
+            }
+        }
+
         this.verticesAdded.addAll(graph.verticesAdded);
         this.verticesRemoved.addAll(graph.verticesRemoved);
         this.edgesAdded.addAll(graph.edgesAdded);
         this.edgesRemoved.addAll(graph.edgesRemoved);
     }
-
 
 
     /**
@@ -202,13 +219,14 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
 
     /**
      * Make a copy of this.graph */
-    public Graph_addWins<T> copy() {
-        Graph_addWins<T> copy = new Graph_addWins<T>();
+    public Graph_addWins copy() {
+        Graph_addWins copy = new Graph_addWins();
+        copy.initGraph();
 
-        copy.verticesAdded = this.verticesAdded;
-        copy.verticesRemoved = this.verticesRemoved;
-        copy.edgesAdded = this.edgesAdded;
-        copy.edgesRemoved = this.edgesRemoved;
-        return this.getGraph();
+        copy.verticesAdded.addAll(verticesAdded);
+        copy.verticesRemoved.addAll(verticesRemoved);
+        copy.edgesAdded.addAll(edgesAdded);
+        copy.edgesRemoved.addAll(edgesRemoved);
+        return copy;
     }
 }
