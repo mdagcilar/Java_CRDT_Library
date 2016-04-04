@@ -86,7 +86,7 @@ public class Graph_addWinsTest {
 
 
     @Test
-    public void testGetGraph() throws Exception {
+    public void testGetGraph_forVertices() throws Exception {
         replica1.initGraph();
 
         Vertex a = new Vertex("a");

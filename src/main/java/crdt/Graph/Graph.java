@@ -99,6 +99,7 @@ public class Graph<T> implements CRDT<Graph<T>> {
         u.outEdges.remove(edge);
         w.inEdges.remove(edge);
 
+        // prevents removal of the edge that is from the start and end sentinel
         if(!edge.equals(new Edge(startSentinel, endSentinel))){
             edges.remove(edge);
         }
