@@ -10,8 +10,9 @@ import java.util.Set;
  TODO: print tree pretty print
  TODO: remove vertex should re-attaach an edge
  TODO: concurrent add || remove fix
- TODO: addwins - how can we remove a Vertex
+ TODO: addwins - revert removes
  TODO: removeVertex - must remove all the vertexes below itself.
+ TODO: Store removed Edges?
  */
 public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
 
@@ -20,7 +21,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
      * We do not need to store removed Edges but we still use a TwoPhaseSet for simplicity and consistency.
      */
     public Set<Vertex> verticesAdded, verticesRemoved;
-    public Set<Edge> edges;
+    public Set<Edge> edgesAdded, edgesRemoved;
     public Vertex startSentinel, endSentinel;
 
 
@@ -30,7 +31,8 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
     public void initGraph(){
         verticesAdded = new HashSet<Vertex>();
         verticesRemoved = new HashSet<Vertex>();
-        edges = new HashSet<Edge>();
+        edgesAdded = new HashSet<Edge>();
+        edgesRemoved = new HashSet<Edge>();
 
         //Initialize the Vertex set with the sentinels and add the edge between them.
         startSentinel = new Vertex("startSentinel");
@@ -38,7 +40,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         verticesAdded.add(startSentinel);
         verticesAdded.add(endSentinel);
         Edge initSentinelEdge = new Edge(startSentinel, endSentinel);
-        edges.add(initSentinelEdge);
+        edgesAdded.add(initSentinelEdge);
     }
 
     /** @param vertex The Vertex to lookup if it exists.
@@ -54,7 +56,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
      */
     public boolean lookupEdge(Edge edge)
     {
-        return edges.contains(edge);
+        return edgesAdded.contains(edge) && !edgesRemoved.contains(edge);
     }
 
 
@@ -83,7 +85,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         if (lookupVertex(v)) {
             return "Precondition failed - Second node v already exists, cannot add duplicates";
         }
-        if (!edges.contains(new Edge(u, w))) {
+        if (!edgesAdded.contains(new Edge(u, w))) {
             return "Precondition failed - Nodes u and w are more than 1 level apart in the tree";
         }
 
@@ -103,15 +105,15 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
          * This allows Vertexs to have multiple children.
          */
         if(!edge.to.equals(endSentinel)){
-            edges.remove(edge);
+            edgesRemoved.add(edge);
         }
         verticesAdded.add(v);
 
         //add edges from u to v and v to w
         Edge edge1 = new Edge(u, v);
         Edge edge2 = new Edge(v, w);
-        edges.add(edge1);
-        edges.add(edge2);
+        edgesAdded.add(edge1);
+        edgesAdded.add(edge2);
         u.addEdge(v);
         v.addEdge(w);
 
@@ -134,6 +136,22 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         if(v == startSentinel || v == endSentinel){
             return "Precondition failed - Cannot remove start or end Sentinel";
         }
+
+        /**
+         * If the Vertex to be removed is one level above the endSentinel.
+         * 1 - Add that Vertex to the removed set.
+         * 2 - remove the edge between v and End
+         * 3 - re-route the edge that was before v to the endSentinel
+         */
+        if(edgesAdded.contains(new Edge(v, endSentinel))){
+            verticesRemoved.add(v);
+        }
+
+        /**
+         * If the Vertex to be removed has Vertex's below it. We must remove all of them.
+         * 1 -
+         */
+
         verticesRemoved.add(v);
         return "Successfully removed Vertex";
     }
@@ -156,6 +174,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
     public Graph_addWins<T> getGraph()
     {
         this.verticesAdded.removeAll(verticesRemoved);
+        this.edgesAdded.removeAll(edgesRemoved);
         return this;
     }
 
@@ -169,7 +188,8 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
     {
         this.verticesAdded.addAll(graph.verticesAdded);
         this.verticesRemoved.addAll(graph.verticesRemoved);
-        this.edges.addAll(graph.edges);
+        this.edgesAdded.addAll(graph.edgesAdded);
+        this.edgesRemoved.addAll(graph.edgesRemoved);
     }
 
 
@@ -178,7 +198,8 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
 
         copy.verticesAdded = this.verticesAdded;
         copy.verticesRemoved = this.verticesRemoved;
-        copy.edges = this.edges;
+        copy.edgesAdded = this.edgesAdded;
+        copy.edgesRemoved = this.edgesRemoved;
         return copy;
     }
 }
