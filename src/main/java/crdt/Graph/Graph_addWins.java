@@ -78,8 +78,8 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
             return "Precondition failed - Third node w does not exist";
         }
         //Checks if v is a unique new Vertex
-        if (lookupVertex(v)) {
-            return "Precondition failed - Second node v already exists, cannot add duplicates";
+        if (verticesRemoved.contains(v) || verticesAdded.contains(v) ) {
+            return "Precondition failed - Vertex to be added already exists, cannot add duplicates";
         }
         if (!edgesAdded.contains(new Edge(u, w))) {
             return "Precondition failed - Nodes u and w are more than 1 level apart in the tree";
