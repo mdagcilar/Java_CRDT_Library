@@ -3,7 +3,6 @@ package crdt.Graph;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import java.util.Iterator;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.*;
@@ -174,7 +173,7 @@ public class Graph_addWinsTest {
      * by re-adding the Vertices and Edges removed by 'removeVertex' so that the add can succeed.
      */
     @Test
-    public void testMerge_conflict_1() throws Exception {
+    public void testMerge_conflict_addBetween_removeVertex() throws Exception {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -205,20 +204,6 @@ public class Graph_addWinsTest {
         System.out.println(replica2.verticesRemoved);
         System.out.println(replica2.edgesAdded);
         System.out.println(replica2.edgesRemoved);
-
-//        Iterator itr = replica1.verticesRemoved.iterator();
-//
-//        for(Edge e : replica2.edgesAdded){
-//            for(Vertex v : replica1.verticesRemoved){
-//                if(itr.hasNext()){
-//                    if(e.from.equals(v)){
-//                        replica1.verticesRemoved.remove(v);
-//                    }
-//                }
-//            }
-//        }
-
-
 
 
         assertEquals(newHashSet(startSentinel, endSentinel, a, b, c, d, e, f), replica1.getGraph().verticesAdded);
