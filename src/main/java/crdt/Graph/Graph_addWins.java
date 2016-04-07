@@ -208,28 +208,35 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
          */
 
         if(!verticesSetMinus.isEmpty()) {
-            System.out.println("YES THIS HAS ELEMENTS IN IT!! : " + verticesSetMinus );
             for (Edge e : edgesAdded) {
                 for (Vertex v : verticesRemovedCopy) {
                     if (e.from.equals(v)) {
                         graph.verticesRemoved.remove(v);
+                        v.outEdges.add(e);
+                        graph.edgesRemoved.remove(e);
+
                     }
                     if (e.to.equals(v)) {
                         graph.verticesRemoved.remove(v);
+                        v.inEdges.add(e);
+                        graph.edgesRemoved.remove(e);
                     }
                 }
             }
         }
 
         if(!verticesSetMinus2.isEmpty()) {
-            System.out.println("YES THIS HAS ELEMENTS IN IT!! : " + verticesSetMinus2 );
             for (Edge e : graph.edgesAdded) {
                 for (Vertex v : verticesRemovedCopy2) {
                     if (e.from.equals(v)) {
                         verticesRemoved.remove(v);
+                        v.outEdges.add(e);
+                        edgesRemoved.remove(e);
                     }
                     if (e.to.equals(v)) {
                         verticesRemoved.remove(v);
+                        v.inEdges.add(e);
+                        edgesRemoved.remove(e);
                     }
                 }
             }
