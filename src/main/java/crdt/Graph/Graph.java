@@ -3,6 +3,7 @@ package crdt.Graph;
 import crdt.CRDT;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -175,44 +176,46 @@ public class Graph<T> implements CRDT<Graph<T>> {
     }
 
     /**
-     * 1- Concurrent addBetweenVertex and removeVertex causes a conflict.0
+     * 1- Concurrent addBetweenVertex and removeVertex causes a conflict.
      *    Removing a Vertex 'a' whilst concurrently trying to merge a Vertex that
      *    is being adding below 'a', such that 'a' is in the parent path of the Vertex 'v'
-     *    in addBetweenVertex( v , x, w
-     *    Resolve this by:
-     *    1- Is there an Edge in the edgesRemoved set which a new Vertex 'x' relies on.
+     *    in addBetweenVertex( v , x, w)
+     *    conflict resolution:
+     *    If there is a Vertex 'v' in the first replica's added Vertex set and not in replica two's.
+     *    AND there are edges such.that. 'v' is either in the 'from' or 'to' position
      *
      *
-     * @param graph the graph to merge with
+     * @param graph the graph to merge with.
      */
     public void merge(Graph<T> graph)
     {
-        // Make a copy of the 'removed' Vertices so the for loop can iteratively remove a Vertex within the loop
-        // without throwing a ConcurrentModificationException
-        Set<Vertex> verticesRemovedCopy = new HashSet<Vertex>();
-        verticesRemovedCopy.addAll(graph.verticesRemoved);
-
-        Set<Vertex> verticesRemovedCopy2 = new HashSet<Vertex>();
-        verticesRemovedCopy2.addAll(verticesRemoved);
-
-        Set<Vertex> verticesSetMinus = new HashSet<Vertex>(verticesAdded);
-        verticesSetMinus.removeAll(graph.verticesAdded);
-
-        Set<Vertex> verticesSetMinus2 = new HashSet<Vertex>(graph.verticesAdded);
-        verticesSetMinus2.removeAll(verticesAdded);
-
         /**
-         * TODO: How do you identify when a Vertex has been added as a Vertex has been removed. Then re-add removed vertices & edges
-         *
-         * What's the difference in sets when you do a simple removal of a Vertex
-         * And when you do a remove add
-         *
-         *
-         */
+         * Make a copy of the 'removed' Vertices so the 'for loop' can iteratively
+         * remove a Vertex within the loop without throwing a ConcurrentModificationException
+         * Same for Edges.
+          */
+        // copy of the this graphs removed Vertices
+        Set<Vertex> thisVerticesRemovedCopy2 = new HashSet<Vertex>();
+        thisVerticesRemovedCopy2.addAll(verticesRemoved);
 
-        if(!verticesSetMinus.isEmpty()) {
+        // copy of the arguments graph's removed Vertices
+        Set<Vertex> graphVerticesRemovedCopy = new HashSet<Vertex>();
+        graphVerticesRemovedCopy.addAll(graph.verticesRemoved);
+
+        // copy of the this graphs Set difference (set minus) of Vertices
+        Set<Vertex> thisVerticesSetMinus = new HashSet<Vertex>(verticesAdded);
+        thisVerticesSetMinus.removeAll(graph.verticesAdded);
+
+        // copy of the arguments graph's Set difference (set minus) of Vertices
+        Set<Vertex> graphVerticesSetMinus = new HashSet<Vertex>(graph.verticesAdded);
+        graphVerticesSetMinus.removeAll(verticesAdded);
+
+        // if this graphs Set minus is not empty: enter the if statement.
+        if(!thisVerticesSetMinus.isEmpty()) {
+            /** for all the edges in this graph loop through to see if any Vertex 'v' in the removed elements of the argument graph
+                are in the 'to' or 'from' position. Iff remove them from the removed set. Other word 'restore' those Vertex's    */
             for (Edge e : edgesAdded) {
-                for (Vertex v : verticesRemovedCopy) {
+                for (Vertex v : graphVerticesRemovedCopy) {
                     if (e.from.equals(v)) {
                         graph.verticesRemoved.remove(v);
                         v.outEdges.add(e);
@@ -226,10 +229,10 @@ public class Graph<T> implements CRDT<Graph<T>> {
                 }
             }
         }
-
-        if(!verticesSetMinus2.isEmpty()) {
+        /** Similarly as the code above for Vertex's that are in the second arguments graph and not in the current Graph. */
+        if(!graphVerticesSetMinus.isEmpty()) {
             for (Edge e : graph.edgesAdded) {
-                for (Vertex v : verticesRemovedCopy2) {
+                for (Vertex v : thisVerticesRemovedCopy2) {
                     if (e.from.equals(v)) {
                         verticesRemoved.remove(v);
                         v.outEdges.add(e);
@@ -244,6 +247,7 @@ public class Graph<T> implements CRDT<Graph<T>> {
             }
         }
 
+        //Now that all conflicts are dealt with, merge the sets with Set Union
         this.verticesAdded.addAll(graph.verticesAdded);
         this.verticesRemoved.addAll(graph.verticesRemoved);
         this.edgesAdded.addAll(graph.edgesAdded);
@@ -277,11 +281,20 @@ public class Graph<T> implements CRDT<Graph<T>> {
     }
 
     public boolean equals(Graph<T> graph){
-        if((verticesAdded.equals(graph.verticesAdded)) &&
-        (verticesRemoved.equals(graph.verticesRemoved)) &&
-        (edgesAdded.equals(graph.edgesAdded)) &&
-        (edgesRemoved.equals(graph.edgesRemoved)))
-            return true;
-        return false;
+        return
+                verticesAdded.equals(graph.verticesAdded)
+                && verticesRemoved.equals(graph.verticesRemoved)
+                && edgesAdded.equals(graph.edgesAdded)
+                && edgesRemoved.equals(graph.edgesRemoved);
+    }
+
+    public void printTree(){
+        System.out.println("Vertices: " + verticesAdded);
+        System.out.println("Edges: " + edgesAdded);
+
+        for(Vertex v : verticesAdded){
+            System.out.println(v + "'s out edges: " + v.outEdges);
+            System.out.println(v + "'s in edges: " + v.inEdges);
+        }
     }
 }
