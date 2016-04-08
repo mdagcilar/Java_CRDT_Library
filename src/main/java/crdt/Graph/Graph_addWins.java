@@ -201,7 +201,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         /**
          * TODO: How do you identify when a Vertex has been added as a Vertex has been removed. Then re-add removed vertices & edges
          *
-         * What's the difference in sets when you do a simple removal of a Vertx
+         * What's the difference in sets when you do a simple removal of a Vertex
          * And when you do a remove add
          *
          *
@@ -214,7 +214,6 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
                         graph.verticesRemoved.remove(v);
                         v.outEdges.add(e);
                         graph.edgesRemoved.remove(e);
-
                     }
                     if (e.to.equals(v)) {
                         graph.verticesRemoved.remove(v);

@@ -1,6 +1,5 @@
 package crdt.Graph;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -58,12 +57,6 @@ public class Graph_addWinsTest {
 
         assertEquals(newHashSet(edge, edge1, edge2), replica1.edgesAdded);
     }
-
-    /**
-     *  Test: Remove a Vertex from one user. Add the same Vertex to the second user.
-     *        After merging. Should the Vertex be there?
-     */
-    //TODO: this,
 
 
     /**
@@ -262,7 +255,41 @@ public class Graph_addWinsTest {
                 replica2.getGraph().edgesAdded);
     }
 
-  
+    /**
+     *  Test: removing a Vertex 'b' in from one replica. And trying to add that same Vertex to replica 2 before merging.
+     */
+    @Test
+    public void testMerge_conflict_removal() throws Exception {
+        replica1.initGraph();
+        replica2.initGraph();
+
+        replica1.addBetweenVertex(startSentinel, a, replica1.getEndSentinel());
+        replica1.addBetweenVertex(a, b, replica1.getEndSentinel());
+
+        replica2.addBetweenVertex(startSentinel, c, replica2.getEndSentinel());
+
+        //Remove(b) and add 'b' in the other replica before a merge. 'b' should be in the set.
+        replica1.removeVertex(b);
+        replica2.addBetweenVertex(c, b, replica2.getEndSentinel());
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        assertEquals( newHashSet(startSentinel, endSentinel, a, b, c), replica1.getGraph().verticesAdded);
+        assertEquals( newHashSet(edge,
+                        new Edge(startSentinel, a),
+                        new Edge(startSentinel, c), new Edge(c, endSentinel), new Edge(c, b), new Edge(b, endSentinel),
+                        new Edge(a, endSentinel)),
+                replica1.getGraph().edgesAdded);
+
+        assertEquals(newHashSet(startSentinel, endSentinel, a, b, c), replica2.getGraph().verticesAdded);
+        assertEquals( newHashSet(edge,
+                        new Edge(startSentinel, a),
+                        new Edge(startSentinel, c), new Edge(c, endSentinel), new Edge(c, b), new Edge(b, endSentinel),
+                        new Edge(a, endSentinel)),
+                replica2.getGraph().edgesAdded);
+    }
+
 
 
     @Test
