@@ -7,36 +7,37 @@ import java.util.Set;
 
 /**
  TODO: print tree pretty print
- TODO: concurrent add || remove fix - need to in merge method addwins concept
  */
-
 
 public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
 
     /** Each set contains 2 GSets one for added and one for storing removed elements.
      *  We do not need to store removed Edges but we still use a TwoPhaseSet for simplicity and consistency.
      */
-    public Set<Vertex> verticesAdded, verticesRemoved;
-    public Set<Edge> edgesAdded, edgesRemoved;
+    protected Set<Vertex> verticesAdded, verticesRemoved;
+    protected Set<Edge> edgesAdded, edgesRemoved;
     private Vertex startSentinel, endSentinel;
+    private Edge sentinelEdge;
 
 
     /**
      * initialize the graph with start and end sentinels. Ensures acyclicity by the addBetween method.
      */
     public void initGraph(){
+
+        //initialize set instances
         verticesAdded = new HashSet<Vertex>();
         verticesRemoved = new HashSet<Vertex>();
         edgesAdded = new HashSet<Edge>();
         edgesRemoved = new HashSet<Edge>();
 
-        //Initialize the Vertex set with the sentinels and add the edge between them.
+        //initialize the Vertex set with the sentinels and add the edge between them.
         startSentinel = new Vertex("startSentinel");
         endSentinel = new Vertex("endSentinel");
         verticesAdded.add(startSentinel);
         verticesAdded.add(endSentinel);
-        Edge initSentinelEdge = new Edge(startSentinel, endSentinel);
-        edgesAdded.add(initSentinelEdge);
+        sentinelEdge = new Edge(startSentinel, endSentinel);
+        edgesAdded.add(sentinelEdge);
     }
 
     /**
