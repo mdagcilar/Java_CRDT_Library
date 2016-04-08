@@ -123,6 +123,8 @@ public class Graph_Test {
                 new Edge(startSentinel, c), new Edge(c, d), new Edge(c, e), new Edge(d, endSentinel), new Edge(e, endSentinel),
                 new Edge(a, endSentinel), new Edge(c, endSentinel)),
                 replica2.getGraph().edgesAdded);
+
+        assertTrue(replica1.equals(replica2));
     }
 
     /**
@@ -159,6 +161,8 @@ public class Graph_Test {
                 new Edge(startSentinel, a), new Edge(a, b), new Edge(b, endSentinel),
                 new Edge(a, endSentinel)),
                 replica2.getGraph().edgesAdded);
+
+        assertTrue(replica1.equals(replica2));
     }
 
 
@@ -208,6 +212,8 @@ public class Graph_Test {
                         new Edge(startSentinel, c), new Edge(c, d), new Edge(c, e), new Edge(d, f), new Edge(d, endSentinel), new Edge(e, endSentinel), new Edge(f, endSentinel),
                         new Edge(a, endSentinel), new Edge(c, endSentinel)),
                 replica2.getGraph().edgesAdded);
+
+        assertTrue(replica1.equals(replica2));
     }
 
     /**
@@ -256,6 +262,8 @@ public class Graph_Test {
                         new Edge(startSentinel, c), new Edge(c, d), new Edge(c, endSentinel), new Edge(d, endSentinel),
                         new Edge(a, endSentinel)),
                 replica2.getGraph().edgesAdded);
+
+        assertTrue(replica1.equals(replica2));
     }
 
     /**
@@ -291,6 +299,8 @@ public class Graph_Test {
                         new Edge(startSentinel, c), new Edge(c, endSentinel), new Edge(c, b), new Edge(b, endSentinel),
                         new Edge(a, endSentinel)),
                 replica2.getGraph().edgesAdded);
+
+        assertTrue(replica1.equals(replica2));
     }
 
 
@@ -461,5 +471,68 @@ public class Graph_Test {
         Vertex endSentinel = new Vertex("endSentinel");
 
         assertEquals(endSentinel, replica1.getEndSentinel());
+    }
+
+    /**
+     * Test:
+     * Removals of sentinels.
+     * adding duplicate Vertex's
+     * adding between Vertex's that don't exist
+     *
+     */
+    @Test
+    public void test_removals_duplicates() throws Exception {
+        replica1.initGraph();
+        replica2.initGraph();
+
+        replica1.removeVertex(startSentinel);
+        replica1.removeVertex(endSentinel);
+        replica1.removeVertex(startSentinel);
+        replica1.removeVertex(endSentinel);
+
+        replica1.addBetweenVertex(startSentinel, a, endSentinel);
+        replica2.addBetweenVertex(startSentinel, a, endSentinel);
+
+        replica2.addBetweenVertex(startSentinel, c, endSentinel);
+        replica2.addBetweenVertex(b, c, endSentinel);
+
+        replica1.addBetweenVertex(startSentinel, c, endSentinel);
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        assertEquals( newHashSet(startSentinel, endSentinel, a, c), replica1.getGraph().verticesAdded);
+        assertEquals( newHashSet(sentinelEdge,
+                        new Edge(startSentinel, a), new Edge(startSentinel, c), new Edge(a, endSentinel), new Edge(c, endSentinel)),
+                replica1.getGraph().edgesAdded);
+
+        assertEquals( newHashSet(startSentinel, endSentinel, a, c), replica2.getGraph().verticesAdded);
+        assertEquals( newHashSet(sentinelEdge,
+                        new Edge(startSentinel, a), new Edge(startSentinel, c), new Edge(a, endSentinel), new Edge(c, endSentinel)),
+                replica2.getGraph().edgesAdded);
+
+        assertTrue(replica1.equals(replica2));
+    }
+
+    /**
+     * Test: equals() method checks all sets of a Graph have successfully merged.
+     */
+    @Test
+    public void testEquals() throws Exception {
+        replica1.initGraph();
+        replica2.initGraph();
+
+        replica1.addBetweenVertex(startSentinel, a, endSentinel);
+        replica2.addBetweenVertex(startSentinel, d, endSentinel);
+
+        replica2.addBetweenVertex(startSentinel, c, endSentinel);
+        replica2.addBetweenVertex(b, c, endSentinel);
+
+        replica1.addBetweenVertex(startSentinel, c, endSentinel);
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        assertTrue(replica1.equals(replica2));
     }
 }

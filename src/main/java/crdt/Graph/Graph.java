@@ -275,4 +275,13 @@ public class Graph<T> implements CRDT<Graph<T>> {
         copy.edgesRemoved.addAll(edgesRemoved);
         return copy;
     }
+
+    public boolean equals(Graph<T> graph){
+        if((verticesAdded.equals(graph.verticesAdded)) &&
+        (verticesRemoved.equals(graph.verticesRemoved)) &&
+        (edgesAdded.equals(graph.edgesAdded)) &&
+        (edgesRemoved.equals(graph.edgesRemoved)))
+            return true;
+        return false;
+    }
 }
