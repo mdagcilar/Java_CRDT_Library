@@ -9,7 +9,7 @@ import java.util.Set;
  TODO: print tree pretty print
  */
 
-public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
+public class Graph<T> implements CRDT<Graph<T>> {
 
     /** Each set contains 2 GSets one for added and one for storing removed elements.
      *  We do not need to store removed Edges but we still use a TwoPhaseSet for simplicity and consistency.
@@ -17,7 +17,6 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
     protected Set<Vertex> verticesAdded, verticesRemoved;
     protected Set<Edge> edgesAdded, edgesRemoved;
     private Vertex startSentinel, endSentinel;
-    private Edge sentinelEdge;
 
 
     /**
@@ -36,7 +35,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         endSentinel = new Vertex("endSentinel");
         verticesAdded.add(startSentinel);
         verticesAdded.add(endSentinel);
-        sentinelEdge = new Edge(startSentinel, endSentinel);
+        Edge sentinelEdge = new Edge(startSentinel, endSentinel);
         edgesAdded.add(sentinelEdge);
     }
 
@@ -46,8 +45,10 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
     public Vertex getStartSentinel() { return startSentinel; }
     public Vertex getEndSentinel() {return endSentinel; }
 
-    /** @param vertex The Vertex to lookup if it exists.
-     *   Return a boolean value. True if the vertex is in the added set and not in the removed set.**/
+    /**
+     * Return a boolean value. True if the vertex is in the added set and not in the removed set.
+     * @param vertex The Vertex to lookup if it exists.
+     * **/
     public boolean lookupVertex(Vertex vertex) {
         return verticesAdded.contains(vertex) && !verticesRemoved.contains(vertex); }
 
@@ -69,21 +70,25 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
      * This is a CRDT because addEdge(addBetween) is either concerned with different edges (respect to vertices) in which can
      * they are independent. Or the same edge (with respect to vertices), in which case the execution is idempotent (duplicate delivery doesn't matter)
      */
-    public String addBetweenVertex(Vertex u, Vertex v, Vertex w) {
+    public void addBetweenVertex(Vertex u, Vertex v, Vertex w) {
         //Checks if u is in the Vertex Set
         if (!lookupVertex(u)) {
-            return "Precondition failed - First node u does not exist";
+            //Precondition failed - First node u does not exist
+            return;
         }
         //Checks if w is in the Vertex Set
         if (!lookupVertex(w)) {
-            return "Precondition failed - Third node w does not exist";
+            //Precondition failed - Third node w does not exist
+            return;
         }
         //Checks if v is a unique new Vertex
-        if (verticesRemoved.contains(v) || verticesAdded.contains(v) ) {
-            return "Precondition failed - Vertex to be added already exists, cannot add duplicates";
+        if (verticesAdded.contains(v) || verticesRemoved.contains(v)) {
+            //Precondition failed - Vertex to be added already exists, cannot add duplicates
+            return;
         }
         if (!edgesAdded.contains(new Edge(u, w))) {
-            return "Precondition failed - Nodes u and w are more than 1 level apart in the tree";
+            //Precondition failed - Nodes u and w are more than 1 level apart in the tree
+            return;
         }
 
         /**
@@ -99,7 +104,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
 
         /**
          * Prevents removal of the edge that is from the start and end sentinel and any edge that points to the end.
-         * This allows Vertexs to have multiple children.
+         * This allows Vertex's to have multiple children.
          */
         if(!edge.to.equals(endSentinel)){
             edgesRemoved.add(edge);
@@ -107,14 +112,10 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
         verticesAdded.add(v);
 
         //add edges from u to v and v to w
-        Edge edge1 = new Edge(u, v);
-        Edge edge2 = new Edge(v, w);
-        edgesAdded.add(edge1);
-        edgesAdded.add(edge2);
+        edgesAdded.add(new Edge(u, v));
+        edgesAdded.add(new Edge(v, w));
         u.addEdge(v);
         v.addEdge(w);
-
-        return "Successfully added node";
     }
 
 
@@ -122,17 +123,19 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
      * Removing a Vertex (File or Directory) has the same effect. The sub branch of the tree below
      * will be removed because we do not distinguish between Files and Directories. This is to simplify
      * the problem, and can be introduced later to handle this problem.
+     *
      * @param v Vertex to be removed
-     * @return String message to result the reszult of the method.
      */
-    public String removeVertex(Vertex v)
+    public void removeVertex(Vertex v)
     {
         if(!lookupVertex(v)){
-            return "Precondition failed - Vertex does not exist, cannot remove a Vertex if it does not exist";
+            //Precondition failed - Vertex does not exist, cannot remove a Vertex if it does not exist
+            return;
         }
         // check if 'v' is either of the sentinels
         if((v.equals(startSentinel)) || (v.equals(endSentinel))){
-            return "Precondition failed - Cannot remove start or end Sentinel";
+            //Precondition failed - Cannot remove start or end Sentinel
+            return;
         }
 
         /** Vertex should be remove. Could have sub vertex that also need to be removed.
@@ -169,7 +172,6 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
                 }
             }
         }
-        return "Successfully removed Vertex";
     }
 
     /**
@@ -183,7 +185,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
      *
      * @param graph the graph to merge with
      */
-    public void merge(Graph_addWins<T> graph)
+    public void merge(Graph<T> graph)
     {
         // Make a copy of the 'removed' Vertices so the for loop can iteratively remove a Vertex within the loop
         // without throwing a ConcurrentModificationException
@@ -254,7 +256,7 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
      * Retain VR, EA and ER.
      * @return The current representation of the Graph, only the correct Vertices & Edges remain
      */
-    public Graph_addWins<T> getGraph()
+    public Graph<T> getGraph()
     {
         this.verticesAdded.removeAll(verticesRemoved);
         this.edgesAdded.removeAll(edgesRemoved);
@@ -263,8 +265,8 @@ public class Graph_addWins<T> implements CRDT<Graph_addWins<T>> {
 
     /**
      * Make a copy of this.graph */
-    public Graph_addWins<T> copy() {
-        Graph_addWins<T> copy = new Graph_addWins<T>();
+    public Graph<T> copy() {
+        Graph<T> copy = new Graph<T>();
         copy.initGraph();
 
         copy.verticesAdded.addAll(verticesAdded);

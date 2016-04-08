@@ -5,13 +5,13 @@ import org.junit.Test;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.*;
 
-public class Graph_addWinsTest {
+public class Graph_Test {
 
     /**
      * Graph instances and Vertex instances to minimize repeating code in each Test case.
      */
-    Graph_addWins<String> replica1 = new Graph_addWins<String>();
-    Graph_addWins<String> replica2 = new Graph_addWins<String>();
+    Graph<String> replica1 = new Graph<String>();
+    Graph<String> replica2 = new Graph<String>();
 
     //create instances of Vertex to re-use throughout tests
     Vertex startSentinel = new Vertex("startSentinel");
