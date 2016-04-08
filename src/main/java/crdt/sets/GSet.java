@@ -1,9 +1,6 @@
 package crdt.sets;
 
-
 import crdt.CRDT;
-import crdt.Graph.Vertex;
-
 import java.util.*;
 
 public class GSet<T> implements CRDT<GSet<T>> {
@@ -14,9 +11,8 @@ public class GSet<T> implements CRDT<GSet<T>> {
     private Set<T> elements = new LinkedHashSet<T>();
 
     /**
-     * return true if the set contains the element passed in
-     * @param element
-     * @return
+     * @param element to check
+     * @return true if set contains element.
      */
     public boolean contains(T element)
     {
@@ -61,15 +57,5 @@ public class GSet<T> implements CRDT<GSet<T>> {
     {
         List<T> nameList = new ArrayList<T>(elements);
         return nameList.get(index);
-    }
-
-    //TODO: remove method
-    public void printLinkedHashSet()
-    {
-        Iterator<T> itr = elements.iterator();
-        while(itr.hasNext()){
-            T t = itr.next();
-            System.out.println(t);
-        }
     }
 }

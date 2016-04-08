@@ -8,8 +8,15 @@ public class Edge {
         this.from = from;
         this.to = to;
     }
+
+    /**
+     * check to see whether the class of the argument is equal (or compatible) to the
+     * implementing class before casting it.
+     */
     @Override
     public boolean equals(Object obj) {
+        if(getClass() != obj.getClass())
+            return false;
         Edge e = (Edge)obj;
         return e.from.toString().equals(from.toString()) && e.to.toString().equals(to.toString());
     }

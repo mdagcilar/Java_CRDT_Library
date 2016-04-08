@@ -28,13 +28,6 @@ public class VertexTest {
     }
 
     @Test
-    public void testEquals_sameVertex() throws Exception {
-        Vertex a = new Vertex("test");
-
-        assertTrue(a.equals(a));
-    }
-
-    @Test
     public void testEquals_differentVertexName() throws Exception {
         Vertex a = new Vertex("a");
         Vertex b = new Vertex("b");

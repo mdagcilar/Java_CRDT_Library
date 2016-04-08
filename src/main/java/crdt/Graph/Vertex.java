@@ -27,9 +27,7 @@ public class Vertex {
 
     @Override
     public boolean equals(Object o) {
-        if(this.toString().equals(o.toString()))
-            return true;
-        return false;
+        return this.toString().equals(o.toString()) && (getClass() == o.getClass());
     }
 
     @Override
