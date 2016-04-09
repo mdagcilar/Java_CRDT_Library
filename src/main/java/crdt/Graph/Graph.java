@@ -2,13 +2,10 @@ package crdt.Graph;
 
 import crdt.CRDT;
 
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
-/**
- TODO: print tree pretty print
- */
 
 public class Graph<T> implements CRDT<Graph<T>> {
 
@@ -288,13 +285,36 @@ public class Graph<T> implements CRDT<Graph<T>> {
                 && edgesRemoved.equals(graph.edgesRemoved);
     }
 
-    public void printTree(){
-        System.out.println("Vertices: " + verticesAdded);
-        System.out.println("Edges: " + edgesAdded);
 
-        for(Vertex v : verticesAdded){
-            System.out.println(v + "'s out edges: " + v.outEdges);
-            System.out.println(v + "'s in edges: " + v.inEdges);
+    public ArrayList<String> printGraphPaths(Vertex x){
+        ArrayList<String> paths = new ArrayList<String>();
+
+        if(x.equals(startSentinel)) {
+            for (Edge e : edgesAdded) {
+                if (e.from.equals(startSentinel) && !(e.to.equals(endSentinel))) {
+                    String path = "|-/" + e.to.toString();
+                    findPaths(e.to, path, paths);
+                }
+            }
+        }
+        return paths;
+
+        /*
+         for(String a : paths){
+            System.out.println("paths: " + a);
+        }
+         */
+    }
+
+    public void findPaths(Vertex v, String path, ArrayList<String> paths){
+        for(Edge e2 : v.outEdges){
+            if(e2.to.equals(endSentinel))
+                return;
+
+            String newPath = path + "/" + e2.to.toString();
+            if(!e2.to.outEdges.isEmpty())
+                findPaths(e2.to, newPath, paths);
+            paths.add(newPath);
         }
     }
 }

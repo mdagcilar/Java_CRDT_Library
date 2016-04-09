@@ -2,6 +2,8 @@ package crdt.Graph;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
+
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.*;
 
@@ -534,5 +536,31 @@ public class Graph_Test {
         replica2.merge(replica1);
 
         assertTrue(replica1.equals(replica2));
+    }
+
+    @Test
+    public void testPrintGraphPaths(){
+        replica1.initGraph();
+        replica2.initGraph();
+
+        replica1.addBetweenVertex(startSentinel, a, endSentinel);
+        replica1.addBetweenVertex(a, b, endSentinel);
+        replica1.addBetweenVertex(a, c, endSentinel);
+        replica1.addBetweenVertex(c, d, endSentinel);
+
+        replica1.addBetweenVertex(startSentinel, f, endSentinel);
+        replica1.addBetweenVertex(f, g, endSentinel);
+
+        replica1.merge(replica2);
+
+        replica1.printGraphPaths(startSentinel);
+
+        ArrayList<String> result = new ArrayList<String>();
+        result.add("|-/a/b");
+        result.add("|-/a/c/d");
+        result.add("|-/a/c");
+        result.add("|-/f/g");
+
+        assertEquals(replica1.printGraphPaths(startSentinel), result);
     }
 }
