@@ -265,7 +265,8 @@ public class Graph<T> implements CRDT<Graph<T>> {
     }
 
     /**
-     * Make a copy of this.graph */
+     * Make a copy of this.graph
+     */
     public Graph<T> copy() {
         Graph<T> copy = new Graph<T>();
         copy.initGraph();
@@ -285,12 +286,19 @@ public class Graph<T> implements CRDT<Graph<T>> {
                 && edgesRemoved.equals(graph.edgesRemoved);
     }
 
-
+    /**
+     * Takes a Vertex, loops through all the edges in this graph. Add the 'to' edge in Edge(from, to)
+     * to the String path. the recursively find edges connected to that Vertex using the recursive method
+     * findPaths().
+     *
+     * @param x the Vertex to start the path finding from. Usually the start sentinel.
+     * @return an ArrayList of all the paths in the Graph.
+     */
     public ArrayList<String> printGraphPaths(Vertex x){
         ArrayList<String> paths = new ArrayList<String>();
 
         if(x.equals(startSentinel)) {
-            for (Edge e : edgesAdded) {
+            for (Edge e : getGraph().edgesAdded) {
                 if (e.from.equals(startSentinel) && !(e.to.equals(endSentinel))) {
                     String path = "|-/" + e.to.toString();
                     findPaths(e.to, path, paths);
@@ -298,14 +306,14 @@ public class Graph<T> implements CRDT<Graph<T>> {
             }
         }
         return paths;
-
-        /*
-         for(String a : paths){
-            System.out.println("paths: " + a);
-        }
-         */
     }
 
+    /**
+     * findPaths recursively finds edges connected to the Vertex 'v'.
+     * @param v Vertex to
+     * @param path
+     * @param paths
+     */
     public void findPaths(Vertex v, String path, ArrayList<String> paths){
         for(Edge e2 : v.outEdges){
             if(e2.to.equals(endSentinel))
