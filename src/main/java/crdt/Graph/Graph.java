@@ -310,9 +310,9 @@ public class Graph<T> implements CRDT<Graph<T>> {
 
     /**
      * findPaths recursively finds edges connected to the Vertex 'v'.
-     * @param v Vertex to
-     * @param path
-     * @param paths
+     * @param v the vertex to recursively loop through the outEdges of.
+     * @param path the String that holds the concatenated strings to form the path.
+     * @param paths ArrayList of paths
      */
     public void findPaths(Vertex v, String path, ArrayList<String> paths){
         for(Edge e2 : v.outEdges){
