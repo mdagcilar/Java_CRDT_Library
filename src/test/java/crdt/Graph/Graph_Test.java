@@ -2,7 +2,7 @@ package crdt.Graph;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
+import java.util.*;
 
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.*;
@@ -14,8 +14,12 @@ public class Graph_Test {
      */
     Graph<String> replica1 = new Graph<String>();
     Graph<String> replica2 = new Graph<String>();
+    Graph<String> replica3 = new Graph<String>();
+    Graph<String> replica4 = new Graph<String>();
 
-    //create instances of Vertex to re-use throughout tests
+    /**
+     * create instances of Vertex's to re-use throughout tests
+     */
     Vertex startSentinel = new Vertex("startSentinel");
     Vertex endSentinel = new Vertex("endSentinel");
     Vertex a = new Vertex("a");
@@ -25,15 +29,28 @@ public class Graph_Test {
     Vertex e = new Vertex("e");
     Vertex f = new Vertex("f");
     Vertex g = new Vertex("g");
+    Vertex h = new Vertex("h");
+    Vertex i = new Vertex("i");
+    Vertex j = new Vertex("j");
+    Vertex k = new Vertex("k");
+    Vertex l = new Vertex("l");
+    Vertex m = new Vertex("m");
+    Vertex n = new Vertex("n");
+    Vertex o = new Vertex("o");
+
 
     //create the Edge between the start and end markers. To save repeat code.
     Edge sentinelEdge = new Edge(startSentinel, endSentinel);
+
+    ArrayList<Graph> graphs;
+    ArrayList<Vertex> vertexes;
+    ArrayList<Vertex> betweenVertexes;
 
     /**
      * Test: initGraph() adds the start and end sentinels.
      */
     @Test
-    public void testInitGraph_AddedSentinels() throws Exception {
+    public void testInitGraph_AddedSentinels() {
         replica1.initGraph();
         assertEquals(newHashSet(startSentinel, endSentinel), replica1.verticesAdded);
     }
@@ -46,7 +63,7 @@ public class Graph_Test {
      * the original edge u-v should be removed.
      */
     @Test
-    public void testAddBetweenVertex_addsToVertices() throws Exception {
+    public void testAddBetweenVertex_addsToVertices() {
         replica1.initGraph();
 
         //Add Vertex 'a' between the start and end sentinels
@@ -62,7 +79,7 @@ public class Graph_Test {
      * This test ensures that all Edges between nodes and Vertices are successfully removed.
      */
     @Test
-    public void testRemoveVertex_entireSubtree() throws Exception {
+    public void testRemoveVertex_entireSubtree() {
         replica1.initGraph();
 
         replica1.addBetweenVertex(startSentinel, a, endSentinel);
@@ -81,7 +98,7 @@ public class Graph_Test {
      * Test: Remove Vertex 'b' which has no nodes below it. Test whether the correct Vertex's are removed.
      */
     @Test
-    public void testRemoveEdge_One_level_above_EndSentinel() throws Exception {
+    public void testRemoveEdge_One_level_above_EndSentinel(){
         replica1.initGraph();
 
         replica1.addBetweenVertex(startSentinel, a, endSentinel);
@@ -98,7 +115,7 @@ public class Graph_Test {
      * Test Union: Simple Merge to see if two graphs can merge together to represent the same Edges and Vertices.
      */
     @Test
-    public void testMerge_test_union_noConflicts() throws Exception {
+    public void testMerge_test_union_noConflicts() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -133,7 +150,7 @@ public class Graph_Test {
      * Test: If graphs can converge after one removes a sub-tree of Vertex's
      */
     @Test
-    public void testMerge_withRemoveVertex_noConflict() throws Exception {
+    public void testMerge_withRemoveVertex_noConflict() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -181,7 +198,7 @@ public class Graph_Test {
      * automatic deterministic conflict resolution semantic built into the data type.
      */
     @Test
-    public void testMerge_conflict_addBetween_removeVertex() throws Exception {
+    public void testMerge_conflict_addBetween_removeVertex() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -229,7 +246,7 @@ public class Graph_Test {
      *  replica2.addBetweenVertex(d, f, replica2.getEndSentinel());
      */
     @Test
-    public void testMerge_conflict_addBetween_removeVertex_partialTree_removal() throws Exception {
+    public void testMerge_conflict_addBetween_removeVertex_partialTree_removal() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -272,7 +289,7 @@ public class Graph_Test {
      *  Test: Removing a Vertex 'b' from one replica. And trying to add that same Vertex to replica 2 before merging.
      */
     @Test
-    public void testMerge_conflict_removal() throws Exception {
+    public void testMerge_conflict_removal() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -307,10 +324,24 @@ public class Graph_Test {
 
 
     /**
+     * Test for checking that merge see sentinels as the same elements and not unique.
+     */
+    @Test
+    public void testMerge_noDuplicateSentinels() {
+        replica1.initGraph();
+        replica2.initGraph();
+
+        replica1.merge(replica2);
+
+        assertEquals(newHashSet(startSentinel, endSentinel), replica1.verticesAdded);
+        assertEquals(newHashSet(startSentinel, endSentinel), replica2.verticesAdded);
+    }
+
+    /**
      * Test: getGraph method returns correct set minuses for Vertices and Edges.
      */
     @Test
-    public void testGetGraph() throws Exception {
+    public void testGetGraph() {
         replica1.initGraph();
 
         replica1.addBetweenVertex(startSentinel, a, endSentinel);
@@ -341,21 +372,6 @@ public class Graph_Test {
         assertEquals( newHashSet(new Edge(b, c), new Edge(c, endSentinel)), replica1.getGraph().edgesRemoved);
     }
 
-    /**
-     * Test for checking that merge see sentinels as the same elements and not unique.
-     */
-    @Test
-    public void testMerge_noDuplicateSentinels() throws Exception {
-        replica1.initGraph();
-        replica2.initGraph();
-
-        replica1.merge(replica2);
-
-        assertEquals(newHashSet(startSentinel, endSentinel), replica1.verticesAdded);
-        assertEquals(newHashSet(startSentinel, endSentinel), replica2.verticesAdded);
-    }
-
-
     @Test
     public void testInitialization(){
         replica1.initGraph();
@@ -383,7 +399,7 @@ public class Graph_Test {
     }
 
     @Test
-    public void testCopy() throws Exception {
+    public void testCopy() {
         replica1.initGraph();
         Vertex v = new Vertex("v");
 
@@ -404,7 +420,7 @@ public class Graph_Test {
      * Test: lookupVertex returns the correct boolean value.
      */
     @Test
-    public void testLookupVertex_true() throws Exception {
+    public void testLookupVertex_true() {
         replica1.initGraph();
 
         replica1.verticesAdded.add(a);
@@ -416,7 +432,7 @@ public class Graph_Test {
      * Creating a Vertex, never adding it. Should return false.
      */
     @Test
-    public void testLookupVertex_false() throws Exception {
+    public void testLookupVertex_false() {
         replica1.initGraph();
 
         Vertex v = new Vertex("v");
@@ -428,7 +444,7 @@ public class Graph_Test {
     * Test: testLookupEdge returns the correct boolean value.
      */
     @Test
-    public void testLookupEdge_true() throws Exception {
+    public void testLookupEdge_true() {
         replica1.initGraph();
 
         Vertex v = new Vertex("v");
@@ -445,7 +461,7 @@ public class Graph_Test {
      *Creating an Edge, never adding it. Should return false
      */
     @Test
-    public void testLookupEdge_false() throws Exception {
+    public void testLookupEdge_false() {
         replica1.initGraph();
 
         Vertex v = new Vertex("v");
@@ -458,7 +474,7 @@ public class Graph_Test {
     }
 
     @Test
-    public void testGetStartSentinel() throws Exception {
+    public void testGetStartSentinel() {
         replica1.initGraph();
 
         Vertex startSentinel = new Vertex("startSentinel");
@@ -467,7 +483,7 @@ public class Graph_Test {
     }
 
     @Test
-    public void testGetEndSentinel() throws Exception {
+    public void testGetEndSentinel() {
         replica1.initGraph();
 
         Vertex endSentinel = new Vertex("endSentinel");
@@ -483,7 +499,7 @@ public class Graph_Test {
      *
      */
     @Test
-    public void test_removals_duplicates() throws Exception {
+    public void test_removals_duplicates() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -520,7 +536,7 @@ public class Graph_Test {
      * Test: equals() method checks all sets of a Graph have successfully merged.
      */
     @Test
-    public void testEquals() throws Exception {
+    public void testEquals() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -538,8 +554,11 @@ public class Graph_Test {
         assertTrue(replica1.equals(replica2));
     }
 
+    /**
+     * Test: If the printed graph returns the same ArrayList of strings.
+     */
     @Test
-    public void testPrintGraphPaths(){
+    public void testPrintGraphPaths() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -563,4 +582,160 @@ public class Graph_Test {
 
         assertEquals(replica1.printGraphPaths(startSentinel), result);
     }
+
+
+    /**
+     * Test: Prove that merge order does not matter. A number of replicas can merge in different sequences and the
+     * end result will be the same - iff each graph sees additions and removals of each graph directly or indirectly.
+     *
+     * direct merge - by merging with that graph
+     * Or
+     * indirect merge - graph 'a' merged with graph 'b' and if graph 'c' merges with 'a' it doesn't have to merge with 'b'
+     * unless 'b' has made a change since 'a' merged with 'b'. This is known as an indirect merge.
+     */
+    @Test
+    public void merge_order_equality(){
+        Graph<String> replica5 = new Graph<String>();
+        Graph<String> replica6 = new Graph<String>();
+        Graph<String> replica7 = new Graph<String>();
+        Graph<String> replica8 = new Graph<String>();
+
+        replica5.initGraph();
+        replica6.initGraph();
+        replica7.initGraph();
+        replica8.initGraph();
+
+        //uses the method 'addRandomVertexes' to randomly add valid Vertex's to replicas 1 through to 4.
+        addRandomVertexes();
+
+        //make copies of the original 4 graphs which have Vertex's in them.
+        replica5 = replica1.copy();
+        replica6 = replica2.copy();
+        replica7 = replica3.copy();
+        replica8 = replica4.copy();
+
+        //Use two different merge orders and assert the equality of the Graphs.
+
+        //first merge
+        replica1.merge(replica2);
+        replica1.merge(replica3);
+        replica1.merge(replica4);
+        replica2.merge(replica1);
+        replica3.merge(replica1);
+        replica4.merge(replica1);
+
+        //second merge
+        replica6.merge(replica7);
+        replica8.merge(replica5);
+        replica6.merge(replica8);
+        replica7.merge(replica8);
+        replica5.merge(replica7);
+        replica5.merge(replica6);
+        replica7.merge(replica6);
+        replica8.merge(replica5);
+
+        assertTrue(replica1.equals(replica5));
+        assertTrue(replica2.equals(replica6));
+        assertTrue(replica3.equals(replica7));
+        assertTrue(replica4.equals(replica8));
+    }
+
+    /**
+     *
+     */
+    @Test
+    public void scale_test() {
+        addRandomVertexes();
+
+        System.out.println("\nrep1: " + replica1.getGraph().edgesAdded.size());
+        System.out.println("rep2: " + replica2.getGraph().edgesAdded.size());
+        System.out.println("rep3: " + replica3.getGraph().edgesAdded.size());
+        System.out.println("rep4: " + replica4.getGraph().edgesAdded.size());
+
+        System.out.println("Total size: " + (replica1.getGraph().edgesAdded.size() + replica2.getGraph().edgesAdded.size() + replica3.getGraph().edgesAdded.size() + replica4.getGraph().edgesAdded.size()));
+
+        //merge all replicas to equivalent states.
+        replica1.merge(replica2);
+        replica1.merge(replica3);
+        replica1.merge(replica4);
+        replica2.merge(replica1);
+        replica3.merge(replica1);
+        replica4.merge(replica1);
+
+        System.out.println("\nrep1: " + replica1.getGraph().edgesAdded.size());
+        System.out.println("rep2: " + replica2.getGraph().edgesAdded.size());
+        System.out.println("rep3: " + replica3.getGraph().edgesAdded.size());
+        System.out.println("rep4: " + replica4.getGraph().edgesAdded.size());
+
+        assertTrue(replica1.equals(replica2));
+        assertTrue(replica2.equals(replica3));
+        assertTrue(replica3.equals(replica4));
+        assertTrue(replica4.equals(replica1));
+    }
+
+    /**
+     * Method: addRandomVertex's
+     *
+     * Takes 3 ArrayLists containing
+     * - 4 graphs ('graphs')
+     * - Set of Vertex's including the start and end sentinel. ('vertexes')
+     * - Set of randomly generated String Vertex's to use as the 'v' in addBetweenVertex(u, v, w). ('betweenVertexes')
+     *
+     * First for loop:
+     * - Generates a random String to create 'k' number of Vertexes in the 'betweenVertexes' ArrayList
+     *
+     * Second for loop:
+     * - Loops through 'x' number of times on a randomly selected Graph in the 'graphs' ArrayList to try and find a valid
+     *  Vertex's u, v, w to add a Node to the graph.
+     *  If successfully added, the if statement will catch the newly added Vertex and will add that to the 'vertexes'
+     *  ArrayList. So it's possible to use a Vertex 'v' in the before and after positions. Otherwise no added edge will
+     *  ever be able to be before or after another newly added edge. This is just to improve re-use of Vertexes
+     *
+     *  This method is provided to tests above to show scalability and validity of the addBetweenVertex method.
+     */
+    public void addRandomVertexes(){
+        replica1.initGraph();
+        replica2.initGraph();
+        replica3.initGraph();
+        replica4.initGraph();
+
+        //initialising ArrayLists that hold the graphs, and Vertex's to be added.
+        graphs = new ArrayList<Graph>();
+        vertexes = new ArrayList<Vertex>();
+        betweenVertexes = new ArrayList<Vertex>();
+
+        graphs.addAll( newHashSet(replica1, replica2, replica3, replica4));
+        vertexes.addAll( newHashSet(startSentinel, endSentinel, a, b, c, d, e, f, g, h, i, j, k, l, o, m, n));
+        betweenVertexes.addAll( newHashSet(a, b, c, d, e, f, g, h, i, j, k, l, o, m, n));
+
+        //adds randomly generated Strings to the Vertex set 'k' times.
+        for(int k=0; k<100; k++){
+            betweenVertexes.add(new Vertex(Long.toHexString(Double.doubleToLongBits(Math.random()))));
+        }
+
+        // Random number generator
+        Random rn = new Random();
+
+        //for loop to loop through the Vertex's Hashset and randomly tries to insert new Vertex's to one of the graphs.
+        for(int x=0; x<100000; x++){
+            int num = rn.nextInt(betweenVertexes.size());
+            int num2 = rn.nextInt(graphs.size());
+
+            graphs.get(num2).addBetweenVertex(vertexes.get(rn.nextInt(vertexes.size())), betweenVertexes.get(num), vertexes.get(rn.nextInt(vertexes.size())));
+            //graphs.get(rn.nextInt(graphs.size())).removeVertex(vertexes.get(rn.nextInt(vertexes.size())));
+
+            // To allow added Vertex's to be the 'u' and 'w' nodes, add them to the VertexSubset which is a HashSet
+            // that loops on the between Vertex 'v' in addBetweenVertex(u, v, w)
+            if(graphs.get(num2).verticesAdded.contains(betweenVertexes.get(num))){
+                vertexes.add(betweenVertexes.get(num));
+
+                //to remove duplicates, add all elements to a Hashset then re-add them to an ArrayList.
+                Set<Vertex> hs = new HashSet<Vertex>();
+                hs.addAll(vertexes);
+                vertexes.clear();
+                vertexes.addAll(hs);
+            }
+        }
+    }
 }
+
