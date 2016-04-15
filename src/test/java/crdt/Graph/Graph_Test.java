@@ -2,6 +2,9 @@ package crdt.Graph;
 
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.*;
 
 import static com.google.common.collect.Sets.newHashSet;
@@ -606,7 +609,7 @@ public class Graph_Test {
         replica8.initGraph();
 
         //uses the method 'addRandomVertexes' to randomly add valid Vertex's to replicas 1 through to 4.
-        addRandomVertexes();
+        addRandomVertexes(1000);
 
         //make copies of the original 4 graphs which have Vertex's in them.
         replica5 = replica1.copy();
@@ -641,37 +644,66 @@ public class Graph_Test {
     }
 
     /**
-     *
+     * Test:
+     * todo: do the same for removals. To prove consistency.
      */
     @Test
     public void scale_test() {
-        addRandomVertexes();
 
-        System.out.println("\nrep1: " + replica1.getGraph().edgesAdded.size());
-        System.out.println("rep2: " + replica2.getGraph().edgesAdded.size());
-        System.out.println("rep3: " + replica3.getGraph().edgesAdded.size());
-        System.out.println("rep4: " + replica4.getGraph().edgesAdded.size());
+        //changes standard output to create a txt file 'merge_average'. Records the average time to compute the merge function.
+        setUpPrintStream();
 
-        System.out.println("Total size: " + (replica1.getGraph().edgesAdded.size() + replica2.getGraph().edgesAdded.size() + replica3.getGraph().edgesAdded.size() + replica4.getGraph().edgesAdded.size()));
+        for (int i = 0; i < 1000; i++) {
+//            System.out.println("\n**********"+i+"**********");
 
-        //merge all replicas to equivalent states.
-        replica1.merge(replica2);
-        replica1.merge(replica3);
-        replica1.merge(replica4);
-        replica2.merge(replica1);
-        replica3.merge(replica1);
-        replica4.merge(replica1);
+            addRandomVertexes(200000);
+            System.out.print(replica1.getGraph().edgesAdded.size() + "," +
+                    replica2.getGraph().edgesAdded.size() + "," +
+                    replica3.getGraph().edgesAdded.size() + "," +
+                    replica4.getGraph().edgesAdded.size() + "," +
+                    (replica1.getGraph().edgesAdded.size() + replica2.getGraph().edgesAdded.size() + replica3.getGraph().edgesAdded.size() + replica4.getGraph().edgesAdded.size()))
+            ;
 
-        System.out.println("\nrep1: " + replica1.getGraph().edgesAdded.size());
-        System.out.println("rep2: " + replica2.getGraph().edgesAdded.size());
-        System.out.println("rep3: " + replica3.getGraph().edgesAdded.size());
-        System.out.println("rep4: " + replica4.getGraph().edgesAdded.size());
+//            System.out.println("\nrep1: " + replica1.getGraph().edgesAdded.size());
+//            System.out.println("rep2: " + replica2.getGraph().edgesAdded.size());
+//            System.out.println("rep3: " + replica3.getGraph().edgesAdded.size());
+//            System.out.println("rep4: " + replica4.getGraph().edgesAdded.size());
 
-        assertTrue(replica1.equals(replica2));
-        assertTrue(replica2.equals(replica3));
-        assertTrue(replica3.equals(replica4));
-        assertTrue(replica4.equals(replica1));
+            //System.out.println("Attempted to add: " + 10000 + "vertices. Total Vertices added: " + (replica1.getGraph().edgesAdded.size() + replica2.getGraph().edgesAdded.size() + replica3.getGraph().edgesAdded.size() + replica4.getGraph().edgesAdded.size()));
+
+            //Record this time using nanoTime()
+            long startTime = System.nanoTime();
+            //merge all replicas to equivalent states.
+            replica1.merge(replica2);
+            replica1.merge(replica3);
+            replica1.merge(replica4);
+            replica2.merge(replica1);
+            replica3.merge(replica1);
+            replica4.merge(replica1);
+            long endTime = System.nanoTime();
+            long duration = (endTime - startTime);  //divide by 1000000 to get milliseconds.
+
+            System.out.print(",0." + duration + ",");
+            //System.out.println("\nThat took: 0." + duration / 1000 + " milli seconds");
+
+
+
+//            System.out.println("\nrep1: " + replica1.getGraph().edgesAdded.size());
+//            System.out.println("rep2: " + replica2.getGraph().edgesAdded.size());
+//            System.out.println("rep3: " + replica3.getGraph().edgesAdded.size());
+//            System.out.println("rep4: " + replica4.getGraph().edgesAdded.size());
+
+            assertTrue(replica1.equals(replica2));
+            assertTrue(replica2.equals(replica3));
+            assertTrue(replica3.equals(replica4));
+            assertTrue(replica4.equals(replica1));
+
+            System.out.print(replica1.getGraph().edgesAdded.size());
+            System.out.println();
+//            System.out.println("********************\n");
+        }
     }
+
 
     /**
      * Method: addRandomVertex's
@@ -693,7 +725,7 @@ public class Graph_Test {
      *
      *  This method is provided to tests above to show scalability and validity of the addBetweenVertex method.
      */
-    public void addRandomVertexes(){
+    public void addRandomVertexes(int limit){
         replica1.initGraph();
         replica2.initGraph();
         replica3.initGraph();
@@ -717,7 +749,7 @@ public class Graph_Test {
         Random rn = new Random();
 
         //for loop to loop through the Vertex's Hashset and randomly tries to insert new Vertex's to one of the graphs.
-        for(int x=0; x<100000; x++){
+        for(int x=0; x<limit; x++){
             int num = rn.nextInt(betweenVertexes.size());
             int num2 = rn.nextInt(graphs.size());
 
@@ -737,5 +769,18 @@ public class Graph_Test {
             }
         }
     }
+
+    /**
+     * Change standard output to print to a txt file. To record the average time it takes to merge.
+     */
+    public void setUpPrintStream() {
+        try {
+            PrintStream printStream = new PrintStream(new File("average_merge.txt"));
+            System.setOut(printStream);
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
 }
 
