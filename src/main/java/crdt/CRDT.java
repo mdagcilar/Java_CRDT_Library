@@ -1,8 +1,6 @@
 package crdt;
 
-import java.io.Serializable;
-
-public interface CRDT<T extends CRDT<T>> extends Serializable {
+public interface CRDT<T>{
     /**
      * Merge this CRDT with another of the same type.
      */

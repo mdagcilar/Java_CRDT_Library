@@ -2,7 +2,7 @@ package crdt.sets;
 
 import crdt.CRDT;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -42,7 +42,7 @@ public class TwoPhaseSet<T> implements CRDT<TwoPhaseSet<T>> {
         Using a LinkedHashSet because it maintains a linked list of the entries in the set, in the order in which they were inserted.
     */
     public Set<T> getSetMinus() {
-        Set<T> addedSet = new LinkedHashSet<T>( added.get());
+        Set<T> addedSet = new HashSet<T>( added.get());
         addedSet.removeAll(removed.get() );
         return addedSet;
     }

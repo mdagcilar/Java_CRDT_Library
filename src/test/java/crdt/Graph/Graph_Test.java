@@ -3,7 +3,6 @@ package crdt.Graph;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.*;
 
@@ -19,6 +18,22 @@ public class Graph_Test {
     Graph<String> replica2 = new Graph<String>();
     Graph<String> replica3 = new Graph<String>();
     Graph<String> replica4 = new Graph<String>();
+    Graph<String> replica5 = new Graph<String>();
+    Graph<String> replica6 = new Graph<String>();
+    Graph<String> replica7 = new Graph<String>();
+    Graph<String> replica8 = new Graph<String>();
+    Graph<String> replica9 = new Graph<String>();
+    Graph<String> replica10 = new Graph<String>();
+    Graph<String> replica11 = new Graph<String>();
+    Graph<String> replica12 = new Graph<String>();
+    Graph<String> replica13 = new Graph<String>();
+    Graph<String> replica14 = new Graph<String>();
+    Graph<String> replica15 = new Graph<String>();
+    Graph<String> replica16 = new Graph<String>();
+    Graph<String> replica17 = new Graph<String>();
+    Graph<String> replica18 = new Graph<String>();
+    Graph<String> replica19 = new Graph<String>();
+    Graph<String> replica20 = new Graph<String>();
 
     /**
      * create instances of Vertex's to re-use throughout tests
@@ -653,15 +668,35 @@ public class Graph_Test {
         //changes standard output to create a txt file 'merge_average'. Records the average time to compute the merge function.
         setUpPrintStream();
 
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10; i++) {
 //            System.out.println("\n**********"+i+"**********");
 
-            addRandomVertexes(200000);
+            addRandomVertexes(100);
             System.out.print(replica1.getGraph().edgesAdded.size() + "," +
                     replica2.getGraph().edgesAdded.size() + "," +
                     replica3.getGraph().edgesAdded.size() + "," +
                     replica4.getGraph().edgesAdded.size() + "," +
-                    (replica1.getGraph().edgesAdded.size() + replica2.getGraph().edgesAdded.size() + replica3.getGraph().edgesAdded.size() + replica4.getGraph().edgesAdded.size()))
+                    replica5.getGraph().edgesAdded.size() + "," +
+                    replica6.getGraph().edgesAdded.size() + "," +
+                    replica7.getGraph().edgesAdded.size() + "," +
+                    replica8.getGraph().edgesAdded.size() + "," +
+                    replica9.getGraph().edgesAdded.size() + "," +
+                    replica10.getGraph().edgesAdded.size() + "," +
+                    replica11.getGraph().edgesAdded.size() + "," +
+                    replica12.getGraph().edgesAdded.size() + "," +
+                    replica13.getGraph().edgesAdded.size() + "," +
+                    replica14.getGraph().edgesAdded.size() + "," +
+                    replica15.getGraph().edgesAdded.size() + "," +
+                    replica16.getGraph().edgesAdded.size() + "," +
+                    replica17.getGraph().edgesAdded.size() + "," +
+                    replica18.getGraph().edgesAdded.size() + "," +
+                    replica19.getGraph().edgesAdded.size() + "," +
+                    replica20.getGraph().edgesAdded.size() + "," +
+                    (replica1.getGraph().edgesAdded.size() + replica2.getGraph().edgesAdded.size() + replica3.getGraph().edgesAdded.size() + replica4.getGraph().edgesAdded.size() +
+                    replica5.getGraph().edgesAdded.size() + replica6.getGraph().edgesAdded.size() + replica7.getGraph().edgesAdded.size() + replica8.getGraph().edgesAdded.size() +
+                    replica9.getGraph().edgesAdded.size() + replica10.getGraph().edgesAdded.size() + replica11.getGraph().edgesAdded.size() + replica12.getGraph().edgesAdded.size() +
+                    replica13.getGraph().edgesAdded.size() + replica14.getGraph().edgesAdded.size() + replica15.getGraph().edgesAdded.size() + replica16.getGraph().edgesAdded.size() +
+                    replica17.getGraph().edgesAdded.size() + replica18.getGraph().edgesAdded.size() + replica19.getGraph().edgesAdded.size() + replica20.getGraph().edgesAdded.size()))
             ;
 
 //            System.out.println("\nrep1: " + replica1.getGraph().edgesAdded.size());
@@ -677,9 +712,42 @@ public class Graph_Test {
             replica1.merge(replica2);
             replica1.merge(replica3);
             replica1.merge(replica4);
+            replica1.merge(replica5);
+            replica1.merge(replica6);
+            replica1.merge(replica7);
+            replica1.merge(replica8);
+            replica1.merge(replica9);
+            replica1.merge(replica11);
+            replica1.merge(replica12);
+            replica1.merge(replica13);
+            replica1.merge(replica14);
+            replica1.merge(replica15);
+            replica1.merge(replica16);
+            replica1.merge(replica17);
+            replica1.merge(replica18);
+            replica1.merge(replica19);
+            replica1.merge(replica20);
+
             replica2.merge(replica1);
             replica3.merge(replica1);
             replica4.merge(replica1);
+            replica5.merge(replica1);
+            replica6.merge(replica1);
+            replica7.merge(replica1);
+            replica8.merge(replica1);
+            replica9.merge(replica1);
+            replica10.merge(replica1);
+            replica11.merge(replica1);
+            replica12.merge(replica1);
+            replica13.merge(replica1);
+            replica14.merge(replica1);
+            replica15.merge(replica1);
+            replica16.merge(replica1);
+            replica17.merge(replica1);
+            replica18.merge(replica1);
+            replica19.merge(replica1);
+            replica20.merge(replica1);
+
             long endTime = System.nanoTime();
             long duration = (endTime - startTime);  //divide by 1000000 to get milliseconds.
 
@@ -730,18 +798,34 @@ public class Graph_Test {
         replica2.initGraph();
         replica3.initGraph();
         replica4.initGraph();
+        replica5.initGraph();
+        replica6.initGraph();
+        replica7.initGraph();
+        replica8.initGraph();
+        replica9.initGraph();
+        replica10.initGraph();
+        replica11.initGraph();
+        replica12.initGraph();
+        replica13.initGraph();
+        replica14.initGraph();
+        replica15.initGraph();
+        replica16.initGraph();
+        replica17.initGraph();
+        replica18.initGraph();
+        replica19.initGraph();
+        replica20.initGraph();
 
         //initialising ArrayLists that hold the graphs, and Vertex's to be added.
         graphs = new ArrayList<Graph>();
         vertexes = new ArrayList<Vertex>();
         betweenVertexes = new ArrayList<Vertex>();
 
-        graphs.addAll( newHashSet(replica1, replica2, replica3, replica4));
+        graphs.addAll( newHashSet(replica1, replica2, replica3, replica4, replica5, replica6, replica7, replica8, replica9, replica10, replica11, replica12, replica13, replica14, replica15, replica16, replica17, replica18, replica19, replica20));
         vertexes.addAll( newHashSet(startSentinel, endSentinel, a, b, c, d, e, f, g, h, i, j, k, l, o, m, n));
         betweenVertexes.addAll( newHashSet(a, b, c, d, e, f, g, h, i, j, k, l, o, m, n));
 
         //adds randomly generated Strings to the Vertex set 'k' times.
-        for(int k=0; k<100; k++){
+        for(int k=0; k<200; k++){
             betweenVertexes.add(new Vertex(Long.toHexString(Double.doubleToLongBits(Math.random()))));
         }
 

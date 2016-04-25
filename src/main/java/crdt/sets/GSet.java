@@ -6,11 +6,13 @@ import java.util.*;
 public class GSet<T> implements CRDT<GSet<T>> {
 
     /**
-     *  A LinkedHashSet maintains a linked list of the entries in the set, in the order in which they were inserted.
+     *  A HashSet to manage the added elements.
      */
-    private Set<T> elements = new LinkedHashSet<T>();
+    private Set<T> elements = new HashSet<T>();
 
     /**
+     * This method is implemented, so that an instance of GSet can call the contains method on the HashSet.
+     * This method is used by the TwoPhaseSet.java class.
      * @param element to check
      * @return true if set contains element.
      */
@@ -39,7 +41,7 @@ public class GSet<T> implements CRDT<GSet<T>> {
     }
 
     /**
-     * Merge two GSet CRDT's into the current CRDT (set) by Union which is commutative.
+     * Merge two GSet CRDTs into the current CRDT (set) by Union which is commutative.
      * @param set the set to merge with.
      */
     public void merge(GSet<T> set) {
@@ -49,7 +51,7 @@ public class GSet<T> implements CRDT<GSet<T>> {
     public GSet<T> copy(){
         GSet<T> copy = new GSet<T>();
 
-        copy.elements = new LinkedHashSet<T>(elements);
+        copy.elements = new HashSet<T>(elements);
         return copy;
     }
 

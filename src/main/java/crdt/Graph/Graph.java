@@ -9,8 +9,8 @@ import java.util.Set;
 
 public class Graph<T> implements CRDT<Graph<T>> {
 
-    /** Each set contains 2 GSets one for added and one for storing removed elements.
-     *  We do not need to store removed Edges but we still use a TwoPhaseSet for simplicity and consistency.
+    /**
+     *  Each set contains 2 Sets one for added and one for storing removed elements.
      */
     protected Set<Vertex> verticesAdded, verticesRemoved;
     protected Set<Edge> edgesAdded, edgesRemoved;
@@ -65,8 +65,8 @@ public class Graph<T> implements CRDT<Graph<T>> {
      *
      * The Graph must be initialised with left and right sentinels '|-' and '-|' and edge(|-, -|).
      * The only operation for adding a vertex is addBetween in order to maintain the acyclicity property. The first operation must be addBetween(|-, -|).
-     * This is a CRDT because addEdge(addBetween) is either concerned with different edges (respect to vertices) in which can
-     * they are independent. Or the same edge (with respect to vertices), in which case the execution is idempotent (duplicate delivery doesn't matter)
+     * This is a CRDT because addBetween is either concerned with different vertices in which case
+     * they are independent. Or the same vertex, in which case the execution is idempotent (duplicate delivery doesn't matter)
      */
     public void addBetweenVertex(Vertex u, Vertex v, Vertex w) {
         //Checks if u is in the Vertex Set
@@ -89,13 +89,13 @@ public class Graph<T> implements CRDT<Graph<T>> {
             return;
         }
 
-        /**
-         * downstream
-         * - remove the initial edge between u and w
-         * - add the new edge to each node
-         * - add the new Vertex
-         * - add the new edges to the EA set
-         */
+
+
+        // If all preconditions are true, the vertex can be safely added.
+        // 1 - remove the initial edge between (u, w)
+        // 2 - add the two new edges (u, v) and (v, w)
+        // 3 - add the new Vertex (v)
+        // 4 - add the new edges to the EA set
         Edge edge = new Edge(u, w);
         u.outEdges.remove(edge);
         w.inEdges.remove(edge);
@@ -107,6 +107,7 @@ public class Graph<T> implements CRDT<Graph<T>> {
         if(!edge.to.equals(endSentinel)){
             edgesRemoved.add(edge);
         }
+
         verticesAdded.add(v);
 
         //add edges from u to v and v to w
@@ -118,7 +119,7 @@ public class Graph<T> implements CRDT<Graph<T>> {
 
 
     /**
-     * Removing a Vertex (File or Directory) has the same effect. The sub branch of the tree below
+     * Removing a Vertex has the effect of removing the sub branch of the tree, below
      * will be removed because we do not distinguish between Files and Directories. This is to simplify
      * the problem, and can be introduced later to handle this problem.
      *
@@ -159,86 +160,94 @@ public class Graph<T> implements CRDT<Graph<T>> {
 
                 //recursively remove the node below.
                 removeVertex(e.to);
-            //prevents removal of the 'start and end' sentinel.
-            }else if((e.to.equals(v)) && !(e.equals(new Edge(startSentinel, endSentinel)))){
+
+            }else if((e.to.equals(v))){
                 edgesRemoved.add(e);
                 v.inEdges.remove(e);
-
-                //if a Vertex has an edge to this Vertex, remove it from it's edge and let the Vertex stay in the Vertex Set\.
-                if(!(e.from.equals(startSentinel))){
-                    e.from.outEdges.remove(e);
-                }
             }
         }
     }
 
     /**
      * 1- Concurrent addBetweenVertex and removeVertex causes a conflict.
-     *    Removing a Vertex 'a' whilst concurrently trying to merge a Vertex that
-     *    is being adding below 'a', such that 'a' is in the parent path of the Vertex 'v'
+     *    Removing a Vertex 'a' whilst concurrently trying to merge a Vertex that is
+     *    adding below 'a', such that 'a' is in the parent path of the Vertex 'v'
      *    in addBetweenVertex( v , x, w)
      *    conflict resolution:
-     *    If there is a Vertex 'v' in the first replica's added Vertex set and not in replica two's.
-     *    AND there are edges such.that. 'v' is either in the 'from' or 'to' position
+     *
+     *    If a vertex {v}, has been removed in one of the replicas and there is an edge
+     *    in the other replica, such that {v} is in either of the two positions (from, to).
+     *    This means that the other replica relies on that vertex and we restore it.
      *
      *
      * @param graph the graph to merge with.
      */
-    public void merge(Graph<T> graph)
-    {
+    public void merge(Graph<T> graph) {
         /**
          * Make a copy of the 'removed' Vertices so the 'for loop' can iteratively
          * remove a Vertex within the loop without throwing a ConcurrentModificationException
          * Same for Edges.
-          */
+         */
         // copy of the this graphs removed Vertices
-        Set<Vertex> thisVerticesRemovedCopy2 = new HashSet<Vertex>();
-        thisVerticesRemovedCopy2.addAll(verticesRemoved);
+        Set<Vertex> replica1VerticesRemoved = new HashSet<Vertex>();
+        replica1VerticesRemoved.addAll(verticesRemoved);
 
         // copy of the arguments graph's removed Vertices
-        Set<Vertex> graphVerticesRemovedCopy = new HashSet<Vertex>();
-        graphVerticesRemovedCopy.addAll(graph.verticesRemoved);
+        Set<Vertex> replica2VerticesRemoved = new HashSet<Vertex>();
+        replica2VerticesRemoved.addAll(graph.verticesRemoved);
 
+        // this.verticesAdded - graph.verticesAdded
         // copy of the this graphs Set difference (set minus) of Vertices
-        Set<Vertex> thisVerticesSetMinus = new HashSet<Vertex>(verticesAdded);
-        thisVerticesSetMinus.removeAll(graph.verticesAdded);
+        Set<Vertex> rep1VerticesSetMinusRep2 = new HashSet<Vertex>(verticesAdded);
+        rep1VerticesSetMinusRep2.removeAll(graph.verticesAdded);
 
+        // graph.verticesAdded - this.verticesAdded
         // copy of the arguments graph's Set difference (set minus) of Vertices
-        Set<Vertex> graphVerticesSetMinus = new HashSet<Vertex>(graph.verticesAdded);
-        graphVerticesSetMinus.removeAll(verticesAdded);
+        Set<Vertex> rep2VerticesSetMinusRep2 = new HashSet<Vertex>(graph.verticesAdded);
+        rep2VerticesSetMinusRep2.removeAll(verticesAdded);
 
         // if this graphs Set minus is not empty: enter the if statement.
-        if(!thisVerticesSetMinus.isEmpty()) {
-            /** for all the edges in this graph loop through to see if any Vertex 'v' in the removed elements of the argument graph
-                are in the 'to' or 'from' position. Iff remove them from the removed set. Other word 'restore' those Vertex's    */
+        if (!rep1VerticesSetMinusRep2.isEmpty()) {
+
+            //iterate through all the edges in replica1
             for (Edge e : edgesAdded) {
-                for (Vertex v : graphVerticesRemovedCopy) {
+
+                //loop through vertices in the removed set of replica2
+                for (Vertex v : replica2VerticesRemoved) {
                     if (e.from.equals(v)) {
+
+                        //restore vertex v
                         graph.verticesRemoved.remove(v);
-                        v.outEdges.add(e);
                         graph.edgesRemoved.remove(e);
+                        v.outEdges.add(e);
                     }
                     if (e.to.equals(v)) {
+
+                        //restore vertex v
                         graph.verticesRemoved.remove(v);
-                        v.inEdges.add(e);
                         graph.edgesRemoved.remove(e);
+                        v.inEdges.add(e);
                     }
                 }
             }
         }
         /** Similarly as the code above for Vertex's that are in the second arguments graph and not in the current Graph. */
-        if(!graphVerticesSetMinus.isEmpty()) {
+        if (!rep2VerticesSetMinusRep2.isEmpty()) {
             for (Edge e : graph.edgesAdded) {
-                for (Vertex v : thisVerticesRemovedCopy2) {
+                for (Vertex v : replica1VerticesRemoved) {
                     if (e.from.equals(v)) {
+
+                        //restore vertex v
                         verticesRemoved.remove(v);
-                        v.outEdges.add(e);
                         edgesRemoved.remove(e);
+                        v.outEdges.add(e);
                     }
                     if (e.to.equals(v)) {
+
+                        //restore vertex v
                         verticesRemoved.remove(v);
-                        v.inEdges.add(e);
                         edgesRemoved.remove(e);
+                        v.inEdges.add(e);
                     }
                 }
             }

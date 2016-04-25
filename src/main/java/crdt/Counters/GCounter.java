@@ -11,6 +11,11 @@ import static java.lang.Math.max;
 /**
     A state-based Counter that can only increment. Can be used as a building block
     for more complex data structures like PN (positive-negative) counters.
+
+    A GCounter is a state-based counter that can only increment. A HashMap acts as a collection of keys and values
+    to map replicas to their unique integer. Executing the increment method can only increase the value
+    associated with that replica by 1. The value method, iterates through the entire HashMap and returns
+    the sum of all the values in the collection.
  */
 public class GCounter<T> implements CRDT<GCounter<T>> {
 
@@ -21,7 +26,6 @@ public class GCounter<T> implements CRDT<GCounter<T>> {
      */
     public void increment(T key){
         Integer count = counts.get(key);
-
         //if count is null, initialize to 0
         if(count == null)
             count = 0;
@@ -30,7 +34,7 @@ public class GCounter<T> implements CRDT<GCounter<T>> {
     }
 
     /**
-    Query the counter value. Use a int sum to total the values.
+     Query returns the value of the sum of all counters in the HashMap.
      */
     public int value(){
         int sum = 0;
@@ -41,11 +45,12 @@ public class GCounter<T> implements CRDT<GCounter<T>> {
     }
 
     /**
-    Merge two CRDT's and return one CRDt.
+     * Merge() converges the passed in CRDT with the current CRDT. The argument CRDT does not see any changes, only the object that the method is invoked on.
+     * Hashmap.entrySet() is a method used to return a Set view of the mappings contained in the current HashMap.
+    */
+     public void merge(GCounter<T> otherReplica) {
 
-    Hashmap.entrySet() is a method used to get a Set view of the mappings contained in the current map.
-     */
-    public void merge(GCounter<T> otherReplica) {
+        //iterate through the second replicas keys.
         for(Entry<T, Integer> e: otherReplica.counts.entrySet()) {
             T key = e.getKey();
 
@@ -53,7 +58,7 @@ public class GCounter<T> implements CRDT<GCounter<T>> {
                 counts.put(key, max(e.getValue(), counts.get(key)) );
             else
                 counts.put(key, e.getValue());
-         }
+        }
     }
 
 
