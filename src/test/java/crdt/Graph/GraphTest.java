@@ -9,7 +9,7 @@ import java.util.*;
 import static com.google.common.collect.Sets.newHashSet;
 import static org.junit.Assert.*;
 
-public class Graph_Test {
+public class GraphTest {
 
     /**
      * Graph instances and Vertex instances to minimize repeating code in each Test case.
@@ -68,7 +68,7 @@ public class Graph_Test {
      * Test: initGraph() adds the start and end sentinels.
      */
     @Test
-    public void testInitGraph_AddedSentinels() {
+    public void test_graphInit() {
         replica1.initGraph();
         assertEquals(newHashSet(startSentinel, endSentinel), replica1.verticesAdded);
     }
@@ -81,7 +81,7 @@ public class Graph_Test {
      * the original edge u-v should be removed.
      */
     @Test
-    public void testAddBetweenVertex_addsToVertices() {
+    public void test_addBetweenVertex_addsToVertices() {
         replica1.initGraph();
 
         //Add Vertex 'a' between the start and end sentinels
@@ -93,11 +93,28 @@ public class Graph_Test {
 
 
     /**
+     * Tests if the edge the initial edge between (u, w) is remove
+     * when adding (u, v, w)
+     */
+    @Test
+    public void test_addBetweenVertex_edgeRemoval() {
+        replica1.initGraph();
+
+        //Add Vertex 'a' between the start and end sentinels
+        replica1.addBetweenVertex(replica1.getStartSentinel(), a, replica1.getEndSentinel());
+        replica1.addBetweenVertex(a, c, replica1.getEndSentinel());
+        replica1.addBetweenVertex(a, b, c);
+
+        assertTrue(replica1.edgesRemoved.contains(new Edge(a, c)));
+    }
+
+
+    /**
      * Test: Remove an entire subtree of Vertex's including and below 'a'
      * This test ensures that all Edges between nodes and Vertices are successfully removed.
      */
     @Test
-    public void testRemoveVertex_entireSubtree() {
+    public void test_removeVertex_entireSubtree() {
         replica1.initGraph();
 
         replica1.addBetweenVertex(startSentinel, a, endSentinel);
@@ -112,11 +129,54 @@ public class Graph_Test {
         assertEquals( newHashSet(sentinelEdge), replica1.getGraph().edgesAdded);
     }
 
+    // tests if edge between v and the endSentinel is added to the removed edge set.
+    // and edge is removed from the outEdges set.
+    @Test
+    public void test_removeVertex_endSentinelEdge() {
+        replica1.initGraph();
+
+        replica1.addBetweenVertex(startSentinel, a, endSentinel);
+
+        replica1.removeVertex(a);
+
+        Edge edge = new Edge(a, endSentinel);
+
+        assertTrue(replica1.edgesRemoved.contains(edge));
+        assertTrue(!a.outEdges.contains(edge));
+    }
+
+    //tests if the first if statement in removeVertex, removes the correct edges
+    @Test
+    public void test_removeVertex_edgeRemoval() {
+        replica1.initGraph();
+
+        replica1.addBetweenVertex(startSentinel, a, endSentinel);
+        replica1.addBetweenVertex(a, b, endSentinel);
+
+        Edge edge = new Edge(b, endSentinel);
+
+        replica1.edgesAdded.contains(edge);
+        replica1.removeVertex(a);
+
+        assertTrue(replica1.edgesRemoved.contains(edge));
+        assertTrue(!b.outEdges.contains(edge));
+    }
+
+    // tests if the lookupVertex(v) fails upon removeVertex(v)
+    // and returns from the method call.
+    @Test
+    public void test_removeVertex_lookupVertexFailed() {
+        replica1.initGraph();
+
+        replica1.removeVertex(a);
+
+    }
+
     /**
      * Test: Remove Vertex 'b' which has no nodes below it. Test whether the correct Vertex's are removed.
      */
     @Test
-    public void testRemoveEdge_One_level_above_EndSentinel(){
+    public void test_removeEdgeAboveEndSentinel(){
         replica1.initGraph();
 
         replica1.addBetweenVertex(startSentinel, a, endSentinel);
@@ -129,11 +189,12 @@ public class Graph_Test {
         assertEquals( newHashSet(sentinelEdge, new Edge(startSentinel, a), new Edge(a, endSentinel)), replica1.getGraph().edgesAdded);
     }
 
+
     /**
      * Test Union: Simple Merge to see if two graphs can merge together to represent the same Edges and Vertices.
      */
     @Test
-    public void testMerge_test_union_noConflicts() {
+    public void test_merge_no_conflicts() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -168,7 +229,7 @@ public class Graph_Test {
      * Test: If graphs can converge after one removes a sub-tree of Vertex's
      */
     @Test
-    public void testMerge_withRemoveVertex_noConflict() {
+    public void test_merge_conflict_subtree_removal() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -216,7 +277,7 @@ public class Graph_Test {
      * automatic deterministic conflict resolution semantic built into the data type.
      */
     @Test
-    public void testMerge_conflict_addBetween_removeVertex() {
+    public void test_merge_conflict_add_remove() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -264,7 +325,7 @@ public class Graph_Test {
      *  replica2.addBetweenVertex(d, f, replica2.getEndSentinel());
      */
     @Test
-    public void testMerge_conflict_addBetween_removeVertex_partialTree_removal() {
+    public void test_merge_conflict_add_remove_partialTreeRemoval() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -307,7 +368,7 @@ public class Graph_Test {
      *  Test: Removing a Vertex 'b' from one replica. And trying to add that same Vertex to replica 2 before merging.
      */
     @Test
-    public void testMerge_conflict_removal() {
+    public void test_merge_conflict_removal() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -345,7 +406,7 @@ public class Graph_Test {
      * Test for checking that merge see sentinels as the same elements and not unique.
      */
     @Test
-    public void testMerge_noDuplicateSentinels() {
+    public void test_merge_noDuplicateSentinels() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -355,11 +416,13 @@ public class Graph_Test {
         assertEquals(newHashSet(startSentinel, endSentinel), replica2.verticesAdded);
     }
 
+
+
     /**
      * Test: getGraph method returns correct set minuses for Vertices and Edges.
      */
     @Test
-    public void testGetGraph() {
+    public void test_getGraph() {
         replica1.initGraph();
 
         replica1.addBetweenVertex(startSentinel, a, endSentinel);
@@ -391,7 +454,7 @@ public class Graph_Test {
     }
 
     @Test
-    public void testInitialization(){
+    public void test_graphInit_twoReplicas(){
         replica1.initGraph();
         replica2.initGraph();
 
@@ -403,7 +466,7 @@ public class Graph_Test {
      * Test: sets are equal after initialization
      */
     @Test
-    public void test_equals(){
+    public void test_equals_sets(){
         replica1.initGraph();
         replica2.initGraph();
 
@@ -416,8 +479,30 @@ public class Graph_Test {
         assertTrue(replica1.edgesRemoved.equals(replica2.edgesRemoved));
     }
 
+    /**
+     * Test: equals() method checks all sets of a Graph have successfully merged.
+     */
     @Test
-    public void testCopy() {
+    public void test_equals_graph() {
+        replica1.initGraph();
+        replica2.initGraph();
+
+        replica1.addBetweenVertex(startSentinel, a, endSentinel);
+        replica2.addBetweenVertex(startSentinel, d, endSentinel);
+
+        replica2.addBetweenVertex(startSentinel, c, endSentinel);
+        replica2.addBetweenVertex(b, c, endSentinel);
+
+        replica1.addBetweenVertex(startSentinel, c, endSentinel);
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        assertTrue(replica1.equals(replica2));
+    }
+
+    @Test
+    public void test_copy() {
         replica1.initGraph();
         Vertex v = new Vertex("v");
 
@@ -438,7 +523,7 @@ public class Graph_Test {
      * Test: lookupVertex returns the correct boolean value.
      */
     @Test
-    public void testLookupVertex_true() {
+    public void test_lookupVertex_true() {
         replica1.initGraph();
 
         replica1.verticesAdded.add(a);
@@ -450,7 +535,7 @@ public class Graph_Test {
      * Creating a Vertex, never adding it. Should return false.
      */
     @Test
-    public void testLookupVertex_false() {
+    public void test_lookupVertex_false() {
         replica1.initGraph();
 
         Vertex v = new Vertex("v");
@@ -462,7 +547,7 @@ public class Graph_Test {
     * Test: testLookupEdge returns the correct boolean value.
      */
     @Test
-    public void testLookupEdge_true() {
+    public void test_lookupEdge_true() {
         replica1.initGraph();
 
         Vertex v = new Vertex("v");
@@ -479,7 +564,7 @@ public class Graph_Test {
      *Creating an Edge, never adding it. Should return false
      */
     @Test
-    public void testLookupEdge_false() {
+    public void test_lookupEdge_false() {
         replica1.initGraph();
 
         Vertex v = new Vertex("v");
@@ -492,7 +577,7 @@ public class Graph_Test {
     }
 
     @Test
-    public void testGetStartSentinel() {
+    public void test_getStartSentinel() {
         replica1.initGraph();
 
         Vertex startSentinel = new Vertex("startSentinel");
@@ -501,7 +586,7 @@ public class Graph_Test {
     }
 
     @Test
-    public void testGetEndSentinel() {
+    public void test_getEndSentinel() {
         replica1.initGraph();
 
         Vertex endSentinel = new Vertex("endSentinel");
@@ -517,7 +602,7 @@ public class Graph_Test {
      *
      */
     @Test
-    public void test_removals_duplicates() {
+    public void test_duplicate_removals() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -550,33 +635,13 @@ public class Graph_Test {
         assertTrue(replica1.equals(replica2));
     }
 
-    /**
-     * Test: equals() method checks all sets of a Graph have successfully merged.
-     */
-    @Test
-    public void testEquals() {
-        replica1.initGraph();
-        replica2.initGraph();
 
-        replica1.addBetweenVertex(startSentinel, a, endSentinel);
-        replica2.addBetweenVertex(startSentinel, d, endSentinel);
-
-        replica2.addBetweenVertex(startSentinel, c, endSentinel);
-        replica2.addBetweenVertex(b, c, endSentinel);
-
-        replica1.addBetweenVertex(startSentinel, c, endSentinel);
-
-        replica1.merge(replica2);
-        replica2.merge(replica1);
-
-        assertTrue(replica1.equals(replica2));
-    }
 
     /**
      * Test: If the printed graph returns the same ArrayList of strings.
      */
     @Test
-    public void testPrintGraphPaths() {
+    public void test_printGraphPaths() {
         replica1.initGraph();
         replica2.initGraph();
 
@@ -659,39 +724,28 @@ public class Graph_Test {
     }
 
     /**
-     * Test:
-     * todo: do the same for removals. To prove consistency.
+     * Concurrently, adds random vertices to see how well the type scales
+     * Results are outputted to a text file
      */
     @Test
-    public void scale_test() {
+    public void test_scalability_test() {
 
         //changes standard output to create a txt file 'merge_average'. Records the average time to compute the merge function.
-        setUpPrintStream();
+        test_setUpPrintStream();
 
         for (int i = 0; i < 10; i++) {
 //            System.out.println("\n**********"+i+"**********");
 
             addRandomVertexes(100);
             System.out.print(replica1.getGraph().edgesAdded.size() + "," +
-                    replica2.getGraph().edgesAdded.size() + "," +
-                    replica3.getGraph().edgesAdded.size() + "," +
-                    replica4.getGraph().edgesAdded.size() + "," +
-                    replica5.getGraph().edgesAdded.size() + "," +
-                    replica6.getGraph().edgesAdded.size() + "," +
-                    replica7.getGraph().edgesAdded.size() + "," +
-                    replica8.getGraph().edgesAdded.size() + "," +
-                    replica9.getGraph().edgesAdded.size() + "," +
-                    replica10.getGraph().edgesAdded.size() + "," +
-                    replica11.getGraph().edgesAdded.size() + "," +
-                    replica12.getGraph().edgesAdded.size() + "," +
-                    replica13.getGraph().edgesAdded.size() + "," +
-                    replica14.getGraph().edgesAdded.size() + "," +
-                    replica15.getGraph().edgesAdded.size() + "," +
-                    replica16.getGraph().edgesAdded.size() + "," +
-                    replica17.getGraph().edgesAdded.size() + "," +
-                    replica18.getGraph().edgesAdded.size() + "," +
-                    replica19.getGraph().edgesAdded.size() + "," +
+                    replica2.getGraph().edgesAdded.size() + "," + replica3.getGraph().edgesAdded.size() + "," + replica4.getGraph().edgesAdded.size() + "," +
+                    replica5.getGraph().edgesAdded.size() + "," + replica6.getGraph().edgesAdded.size() + "," + replica7.getGraph().edgesAdded.size() + "," +
+                    replica8.getGraph().edgesAdded.size() + "," + replica9.getGraph().edgesAdded.size() + "," + replica10.getGraph().edgesAdded.size() + "," +
+                    replica11.getGraph().edgesAdded.size() + "," + replica12.getGraph().edgesAdded.size() + "," + replica13.getGraph().edgesAdded.size() + "," +
+                    replica14.getGraph().edgesAdded.size() + "," + replica15.getGraph().edgesAdded.size() + "," + replica16.getGraph().edgesAdded.size() + "," +
+                    replica17.getGraph().edgesAdded.size() + "," + replica18.getGraph().edgesAdded.size() + "," + replica19.getGraph().edgesAdded.size() + "," +
                     replica20.getGraph().edgesAdded.size() + "," +
+
                     (replica1.getGraph().edgesAdded.size() + replica2.getGraph().edgesAdded.size() + replica3.getGraph().edgesAdded.size() + replica4.getGraph().edgesAdded.size() +
                     replica5.getGraph().edgesAdded.size() + replica6.getGraph().edgesAdded.size() + replica7.getGraph().edgesAdded.size() + replica8.getGraph().edgesAdded.size() +
                     replica9.getGraph().edgesAdded.size() + replica10.getGraph().edgesAdded.size() + replica11.getGraph().edgesAdded.size() + replica12.getGraph().edgesAdded.size() +
@@ -699,6 +753,7 @@ public class Graph_Test {
                     replica17.getGraph().edgesAdded.size() + replica18.getGraph().edgesAdded.size() + replica19.getGraph().edgesAdded.size() + replica20.getGraph().edgesAdded.size()))
             ;
 
+            //used for debugging in the text file.
 //            System.out.println("\nrep1: " + replica1.getGraph().edgesAdded.size());
 //            System.out.println("rep2: " + replica2.getGraph().edgesAdded.size());
 //            System.out.println("rep3: " + replica3.getGraph().edgesAdded.size());
@@ -709,44 +764,15 @@ public class Graph_Test {
             //Record this time using nanoTime()
             long startTime = System.nanoTime();
             //merge all replicas to equivalent states.
-            replica1.merge(replica2);
-            replica1.merge(replica3);
-            replica1.merge(replica4);
-            replica1.merge(replica5);
-            replica1.merge(replica6);
-            replica1.merge(replica7);
-            replica1.merge(replica8);
-            replica1.merge(replica9);
-            replica1.merge(replica11);
-            replica1.merge(replica12);
-            replica1.merge(replica13);
-            replica1.merge(replica14);
-            replica1.merge(replica15);
-            replica1.merge(replica16);
-            replica1.merge(replica17);
-            replica1.merge(replica18);
-            replica1.merge(replica19);
-            replica1.merge(replica20);
+            replica1.merge(replica2);replica1.merge(replica3);replica1.merge(replica4);replica1.merge(replica5);replica1.merge(replica6);
+            replica1.merge(replica7);replica1.merge(replica8);replica1.merge(replica9);replica1.merge(replica11);replica1.merge(replica12);
+            replica1.merge(replica13);replica1.merge(replica14);replica1.merge(replica15);replica1.merge(replica16);replica1.merge(replica17);
+            replica1.merge(replica18);replica1.merge(replica19);replica1.merge(replica20);
 
-            replica2.merge(replica1);
-            replica3.merge(replica1);
-            replica4.merge(replica1);
-            replica5.merge(replica1);
-            replica6.merge(replica1);
-            replica7.merge(replica1);
-            replica8.merge(replica1);
-            replica9.merge(replica1);
-            replica10.merge(replica1);
-            replica11.merge(replica1);
-            replica12.merge(replica1);
-            replica13.merge(replica1);
-            replica14.merge(replica1);
-            replica15.merge(replica1);
-            replica16.merge(replica1);
-            replica17.merge(replica1);
-            replica18.merge(replica1);
-            replica19.merge(replica1);
-            replica20.merge(replica1);
+            replica2.merge(replica1);replica3.merge(replica1);replica4.merge(replica1);replica5.merge(replica1);replica6.merge(replica1);
+            replica7.merge(replica1);replica8.merge(replica1);replica9.merge(replica1);replica10.merge(replica1);replica11.merge(replica1);
+            replica12.merge(replica1);replica13.merge(replica1);replica14.merge(replica1);replica15.merge(replica1);replica16.merge(replica1);
+            replica17.merge(replica1);replica18.merge(replica1);replica19.merge(replica1);replica20.merge(replica1);
 
             long endTime = System.nanoTime();
             long duration = (endTime - startTime);  //divide by 1000000 to get milliseconds.
@@ -755,7 +781,7 @@ public class Graph_Test {
             //System.out.println("\nThat took: 0." + duration / 1000 + " milli seconds");
 
 
-
+            //used for debugging in the text file
 //            System.out.println("\nrep1: " + replica1.getGraph().edgesAdded.size());
 //            System.out.println("rep2: " + replica2.getGraph().edgesAdded.size());
 //            System.out.println("rep3: " + replica3.getGraph().edgesAdded.size());
@@ -772,6 +798,36 @@ public class Graph_Test {
         }
     }
 
+
+    /**
+     * Test if merge restores vertices correctly. After a concurrent addRemove
+     *
+     */
+    @Test
+    public void test_merge_conflictEdgesRemovals(){
+        replica1.initGraph();
+        replica2.initGraph();
+
+        replica1.addBetweenVertex(startSentinel, a, endSentinel);
+        replica1.addBetweenVertex(a, b, endSentinel);
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        replica2.removeVertex(a);
+        replica1.addBetweenVertex(b, c, endSentinel);
+
+
+
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        Edge edge = new Edge(a, b);
+
+        assertTrue(!replica1.verticesRemoved.contains(a));
+        assertTrue(!replica1.edgesRemoved.contains(edge));
+        assertTrue(a.outEdges.contains(edge));
+    }
 
     /**
      * Method: addRandomVertex's
@@ -794,26 +850,11 @@ public class Graph_Test {
      *  This method is provided to tests above to show scalability and validity of the addBetweenVertex method.
      */
     public void addRandomVertexes(int limit){
-        replica1.initGraph();
-        replica2.initGraph();
-        replica3.initGraph();
-        replica4.initGraph();
-        replica5.initGraph();
-        replica6.initGraph();
-        replica7.initGraph();
-        replica8.initGraph();
-        replica9.initGraph();
-        replica10.initGraph();
-        replica11.initGraph();
-        replica12.initGraph();
-        replica13.initGraph();
-        replica14.initGraph();
-        replica15.initGraph();
-        replica16.initGraph();
-        replica17.initGraph();
-        replica18.initGraph();
-        replica19.initGraph();
-        replica20.initGraph();
+        replica1.initGraph();replica2.initGraph();
+        replica3.initGraph();replica4.initGraph();replica5.initGraph();replica6.initGraph();replica7.initGraph();replica8.initGraph();
+        replica9.initGraph();replica10.initGraph();replica11.initGraph();replica12.initGraph();replica13.initGraph();
+        replica14.initGraph();replica15.initGraph();replica16.initGraph();replica17.initGraph();replica18.initGraph();
+        replica19.initGraph();replica20.initGraph();
 
         //initialising ArrayLists that hold the graphs, and Vertex's to be added.
         graphs = new ArrayList<Graph>();
@@ -857,7 +898,7 @@ public class Graph_Test {
     /**
      * Change standard output to print to a txt file. To record the average time it takes to merge.
      */
-    public void setUpPrintStream() {
+    public void test_setUpPrintStream() {
         try {
             PrintStream printStream = new PrintStream(new File("average_merge.txt"));
             System.setOut(printStream);
@@ -865,6 +906,4 @@ public class Graph_Test {
             System.out.println(e);
         }
     }
-
 }
-

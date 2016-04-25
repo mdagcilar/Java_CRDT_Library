@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 public class GCounterTest {
 
     @Test
-    public void testIncrement() throws Exception {
+    public void testIncrement(){
         GCounter<String> gCounter = new GCounter<String>();
 
         gCounter.increment("hostname1");
@@ -16,7 +16,7 @@ public class GCounterTest {
     }
 
     @Test
-    public void testIncrement_multipleIncrements() throws Exception {
+    public void testIncrement_multipleIncrements() {
         GCounter<String> gCounter = new GCounter<String>();
 
         gCounter.increment("hostname1");
@@ -28,7 +28,7 @@ public class GCounterTest {
     }
 
     @Test
-    public void testIncrement_multipleCounters() throws Exception {
+    public void testIncrement_multipleCounters() {
         GCounter<String> replica1 = new GCounter<String>();
         GCounter<String> replica2 = new GCounter<String>();
 
@@ -41,7 +41,7 @@ public class GCounterTest {
     }
 
     @Test
-    public void testCopy() throws Exception {
+    public void testCopy() {
         GCounter<String> gCounter = new GCounter<String>();
 
         gCounter.increment("hostname1");
@@ -52,7 +52,7 @@ public class GCounterTest {
     }
 
     @Test
-    public void testValue() throws Exception {
+    public void testValue() {
         GCounter<String> replica1 = new GCounter<String>();
         GCounter<String> replica2 = new GCounter<String>();
 
@@ -71,7 +71,7 @@ public class GCounterTest {
      * Merge two different users updating different Keys in the Counter.
      */
     @Test
-    public void testMerge() throws Exception {
+    public void testMerge() {
         GCounter<String> replica1 = new GCounter<String>();
         GCounter<String> replica2 = new GCounter<String>();
 
@@ -88,7 +88,7 @@ public class GCounterTest {
      * Merge both replicas and check their value is the same.
      */
     @Test
-    public void testMerge_mergeBothReplicas() throws Exception {
+    public void testMerge_mergeBothReplicas() {
         GCounter<String> replica1 = new GCounter<String>();
         GCounter<String> replica2 = new GCounter<String>();
 
@@ -108,7 +108,7 @@ public class GCounterTest {
      * taking the Max of the two values. Which disregards duplicate increments.
      */
     @Test
-    public void testMerge_updatingSameKey() throws Exception {
+    public void testMerge_updatingSameKey() {
         GCounter<String> replica1 = new GCounter<String>();
         GCounter<String> replica2 = new GCounter<String>();
 
@@ -125,7 +125,7 @@ public class GCounterTest {
      * Merging at different stages.
      */
     @Test
-    public void testMerge_differentKeys() throws Exception {
+    public void testMerge_differentKeys() {
         GCounter<String> replica1 = new GCounter<String>();
         GCounter<String> replica2 = new GCounter<String>();
 
@@ -147,7 +147,7 @@ public class GCounterTest {
      * Multiple merges has no effect.
      */
     @Test
-    public void testMerge_multipleMerges() throws Exception {
+    public void testMerge_multipleMerges() {
         GCounter<String> replica1 = new GCounter<String>();
         GCounter<String> replica2 = new GCounter<String>();
 
@@ -166,7 +166,7 @@ public class GCounterTest {
      * Testing merge for 3 replicas.
      */
     @Test
-    public void testMerge_threeReplicas() throws Exception {
+    public void testMerge_threeReplicas() {
         GCounter<String> replica1 = new GCounter<String>();
         GCounter<String> replica2 = new GCounter<String>();
         GCounter<String> replica3 = new GCounter<String>();

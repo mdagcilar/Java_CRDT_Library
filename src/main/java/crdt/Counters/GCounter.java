@@ -61,11 +61,6 @@ public class GCounter<T> implements CRDT<GCounter<T>> {
         }
     }
 
-
-    public String toString(){
-        return "GCounter{" + counts + "}";
-    }
-
     /**
     Creates a copy of the current GCounter CRDT and
      */

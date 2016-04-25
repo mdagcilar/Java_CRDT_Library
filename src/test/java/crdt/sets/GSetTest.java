@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 public class GSetTest {
 
     @Test
-    public void testAdd_whenElementsAdded() throws Exception {
+    public void testAdd_whenElementsAdded() {
         GSet<String> gSet = new GSet<String>();
 
         gSet.add("a");
@@ -22,7 +22,7 @@ public class GSetTest {
     }
 
     @Test
-    public void testAdd_addingDuplicates() throws Exception {
+    public void testAdd_addingDuplicates() {
         GSet<String> gSet = new GSet<String>();
 
         gSet.add("a");
@@ -48,7 +48,7 @@ public class GSetTest {
     }
 
     @Test
-    public void testMerge_duplicateElements() throws Exception {
+    public void testMerge_duplicateElements() {
         GSet<String> replica1 = new GSet<String>();
         GSet<String> replica2 = new GSet<String>();
 
@@ -63,7 +63,7 @@ public class GSetTest {
     }
 
     @Test
-    public void testCopy() throws Exception {
+    public void testCopy() {
         GSet<String> gSet = new GSet<String>();
 
         gSet.add("a");
@@ -73,7 +73,7 @@ public class GSetTest {
     }
 
     @Test
-    public void testGetElement() throws Exception {
+    public void testGetElement() {
         GSet<String> gSet = new GSet<String>();
 
         gSet.add("a");

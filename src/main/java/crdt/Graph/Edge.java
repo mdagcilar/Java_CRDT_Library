@@ -15,8 +15,6 @@ public class Edge {
      */
     @Override
     public boolean equals(Object obj) {
-        if(getClass() != obj.getClass())
-            return false;
         Edge e = (Edge)obj;
         return e.from.toString().equals(from.toString()) && e.to.toString().equals(to.toString());
     }

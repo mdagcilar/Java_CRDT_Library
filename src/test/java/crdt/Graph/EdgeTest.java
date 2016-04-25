@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 public class EdgeTest {
 
     @Test
-    public void testEquals() throws Exception {
+    public void testEquals() {
         Vertex v = new Vertex("v");
         Vertex u = new Vertex("u");
 
@@ -19,7 +19,7 @@ public class EdgeTest {
     }
 
     @Test
-    public void testHashCode() throws Exception {
+    public void testHashCode() {
         Vertex v = new Vertex("v");
         Vertex u = new Vertex("u");
 
@@ -30,7 +30,7 @@ public class EdgeTest {
     }
 
     @Test
-    public void testHashCode_2() throws Exception {
+    public void testHashCode_2() {
         Vertex v = new Vertex("v");
         Vertex u = new Vertex("u");
         Vertex w = new Vertex("w");

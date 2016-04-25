@@ -8,7 +8,7 @@ import static org.junit.Assert.*;
 public class VertexTest {
 
     @Test
-    public void testAddEdge() throws Exception {
+    public void testAddEdge() {
         Vertex v = new Vertex("v");
         Vertex u = new Vertex("u");
 
@@ -20,7 +20,7 @@ public class VertexTest {
     }
 
     @Test
-    public void testEquals_differentVertexSameName() throws Exception {
+    public void testEquals_differentVertexSameName() {
         Vertex a = new Vertex("test");
         Vertex b = new Vertex("test");
 
@@ -28,7 +28,7 @@ public class VertexTest {
     }
 
     @Test
-    public void testEquals_differentVertexName() throws Exception {
+    public void testEquals_differentVertexName() {
         Vertex a = new Vertex("a");
         Vertex b = new Vertex("b");
 
@@ -36,7 +36,7 @@ public class VertexTest {
     }
 
     @Test
-    public void testHashCode_1() throws Exception {
+    public void testHashCode_1() {
         Vertex a = new Vertex("a");
         Vertex b = new Vertex("b");
 
@@ -44,7 +44,7 @@ public class VertexTest {
     }
 
     @Test
-    public void testHashCode_2() throws Exception {
+    public void testHashCode_2() {
         Vertex a = new Vertex("a");
         Vertex b = new Vertex("a");
 

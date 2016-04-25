@@ -10,7 +10,7 @@ import static org.junit.Assert.*;
 public class TwoPhaseSetTest {
 
     @Test
-    public void testAdd() throws Exception {
+    public void testAdd() {
         TwoPhaseSet<String> replica1 = new TwoPhaseSet<String>();
 
         replica1.add("a");
@@ -21,7 +21,7 @@ public class TwoPhaseSetTest {
     }
 
     @Test
-    public void testRemove() throws Exception {
+    public void testRemove() {
         TwoPhaseSet<String> replica1 = new TwoPhaseSet<String>();
 
         replica1.add("a");
@@ -33,7 +33,7 @@ public class TwoPhaseSetTest {
     }
 
     @Test
-    public void testRemove_removeNonExistentElement() throws Exception {
+    public void testRemove_removeNonExistentElement() {
         TwoPhaseSet<String> replica1 = new TwoPhaseSet<String>();
 
         replica1.add("a");
@@ -50,7 +50,7 @@ public class TwoPhaseSetTest {
      * *********** Testing different Merging scenarios *************************
      */
     @Test
-    public void testMerge() throws Exception {
+    public void testMerge() {
         TwoPhaseSet<String> replica1 = new TwoPhaseSet<String>();
         TwoPhaseSet<String> replica2 = new TwoPhaseSet<String>();
 
@@ -85,7 +85,7 @@ public class TwoPhaseSetTest {
      * elements that do not exist.
      */
     @Test
-    public void testMerge_threeReplicas() throws Exception {
+    public void testMerge_threeReplicas() {
         TwoPhaseSet<String> replica1 = new TwoPhaseSet<String>();
         TwoPhaseSet<String> replica2 = new TwoPhaseSet<String>();
         TwoPhaseSet<String> replica3 = new TwoPhaseSet<String>();
@@ -109,7 +109,7 @@ public class TwoPhaseSetTest {
     }
 
     @Test
-    public void testGetSetMinus() throws Exception {
+    public void testGetSetMinus() {
         TwoPhaseSet<String> replica1 = new TwoPhaseSet<String>();
 
         replica1.add("a");
@@ -122,7 +122,7 @@ public class TwoPhaseSetTest {
     }
 
     @Test
-    public void testCopy() throws Exception {
+    public void testCopy() {
         TwoPhaseSet<String> replica1 = new TwoPhaseSet<String>();
 
         replica1.add("a");
@@ -130,5 +130,15 @@ public class TwoPhaseSetTest {
         replica1.add("c");
 
         assertEquals( newHashSet("a", "b", "c"), replica1.copy().getSetMinus());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testAddThrowsIllegalArgumentException(){
+        TwoPhaseSet<String> replica1 = new TwoPhaseSet<String>();
+        replica1.add("a");
+        replica1.remove("a");
+
+        //illegal remove
+        replica1.add("a");
     }
 }

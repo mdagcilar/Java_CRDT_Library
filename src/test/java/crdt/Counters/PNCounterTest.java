@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 public class PNCounterTest {
 
     @Test
-    public void testIncrement() throws Exception {
+    public void testIncrement() {
         PNCounter<String> replica1 = new PNCounter<String>();
 
         replica1.increment("hostname1");
@@ -15,7 +15,7 @@ public class PNCounterTest {
     }
 
     @Test
-    public void testIncrement_multiplePNCounters() throws Exception {
+    public void testIncrement_multiplePNCounters() {
         PNCounter<String> replica1 = new PNCounter<String>();
         PNCounter<String> replica2 = new PNCounter<String>();
 
@@ -30,7 +30,7 @@ public class PNCounterTest {
     }
 
     @Test
-    public void testDecrement() throws Exception {
+    public void testDecrement() {
         PNCounter<String> replica1 = new PNCounter<String>();
 
         replica1.increment("hostname1");
@@ -40,7 +40,7 @@ public class PNCounterTest {
     }
 
     @Test
-    public void testDecrement_negative() throws Exception {
+    public void testDecrement_negative() {
         PNCounter<String> replica1 = new PNCounter<String>();
 
         replica1.increment("hostname1");
@@ -59,7 +59,7 @@ public class PNCounterTest {
     }
 
     @Test
-    public void testMerge() throws Exception {
+    public void testMerge(){
         PNCounter<String> replica1 = new PNCounter<String>();
         PNCounter<String> replica2 = new PNCounter<String>();
 
@@ -76,7 +76,7 @@ public class PNCounterTest {
     }
 
     @Test
-    public void testMerge_incrementAndDecrement() throws Exception {
+    public void testMerge_incrementAndDecrement() {
         PNCounter<String> replica1 = new PNCounter<String>();
         PNCounter<String> replica2 = new PNCounter<String>();
 
@@ -97,7 +97,7 @@ public class PNCounterTest {
      * Incrementing each by 1. Then making the counter go to -1.
      */
     @Test
-    public void testMerge_negativeValue() throws Exception {
+    public void testMerge_negativeValue() {
         PNCounter<String> replica1 = new PNCounter<String>();
         PNCounter<String> replica2 = new PNCounter<String>();
 
