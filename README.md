@@ -1,8 +1,9 @@
-# Java_CRDT_Library
+#A State-based CRDT library for Convergent data structures
 
-#What is a CRDT?
+# What is a CRDT?
+
 CRDTs are inspired by the work of Marc Shapiro, Preguiça, Baquero, and Zawirski. In distributed computing, a conflict-free replicated data type (abbreviated CRDT) is a type of specially-designed data structure
-used to achieve strong eventual consistency (SEC) and monotonicity (absence of rollbacks). There are two alternative routes to ensuring SEC: operation-based CRDTs  and state-based CRDTs.
+used to achieve strong eventual consistency (SEC) and monotonicity (absence of rollbacks). There are two alternative routes to ensuring SEC: operation-based CRDTs and state-based CRDTs.
 Simple Conflict-free Replicated Data Types (CRDTs) for distributed systems. CRDTs on different replicas can diverge from one another but at the end they can be safely merged providing an eventually consistent value.
 In other words, CRDTs have a merge method that is idempotent, commutative and associative.
 
@@ -12,52 +13,45 @@ This would lead to merge conflicts in systems using conventional eventual consis
 Under the constraints of the CAP theorem they provide the strongest consistency guarantees for available/partition-tolerant (AP) settings.
 
 #The following CRDTs are implemented in this library
-GCounter
-PNCounter
-GSet
-TwoPhaseSet
-Graph
+- GCounter
+- PNCounter
+- GSet
+- TwoPhaseSet
+- add-wins Graph
 
 #State-based vs Operation-based
 
 #Counter (State-based) G-Counter
-A state-based counter is not as straightforward as one would expect. To simplify the problem, we start with a Counter that only increments.
-
-Suppose the payload was a single integer and merge computes max. This data type is a CvRDT as its states form a monotonic semilattice.
-Consider two replicas, with the same initial state of 0; at each one, a client originates increment. They converge to 1 instead of the expected 2.
-
-The first vector is the P Counter. It holds all the increments for the counter. The second vector is the N Counter, it holds all the decrements.
-Each replica only increments its own entry in the vector. The value of the counter is the difference between the sum of the P Counter and the sum of the N Counter.
-
-Examples
-===========
+A GCounter is a state-based counter that can only increment. A HashMap acts as a 
+collection of keys and values to map replicas to their unique integer. Executing the
+increment method can only increase the value associated with that replica
+by 1. The value method iterates through the entire HashMap and returns 
+the sum of all the values in the collection. Lastly, the merge method takes two
+CRDTs and takes the maximum of each integer in the collection.
+Example behaviour of a GSet.
+============================
 PNCounter:
-```java
-        PNCounter<String> replica1 = new PNCounter<String>();
-        PNCounter<String> replica2 = new PNCounter<String>();
+```java  
+@Test
+    public void testAdd_whenElementsAdded() {
+        GSet<String> gSet = new GSet<String>();
 
-        replica1.increment("hostname1");System.out.println("Replica1 value =" + replica1.value());
-        replica1.increment("hostname1");System.out.println("Replica1 value =" + replica1.value());
+        gSet.add("a");
+        gSet.add("b");
+        gSet.add("c");
 
-        replica2.increment("hostname2");System.out.println("\nReplica2 value =" + replica2.value());
-        replica2.increment("hostname2");System.out.println("Replica2 value =" + replica2.value());
+        assertEquals( newHashSet("a", "b", "c"), gSet.get());
+    }
+    
+    
+@Test
+    public void testAdd_addingDuplicates() {
+        GSet<String> gSet = new GSet<String>();
 
-        replica1.merge( replica2 );
+        gSet.add("a");
+        gSet.add("b");
+        gSet.add("b");
 
-        System.out.println("\nReplica1 value after merge = " + replica1.value());
+        assertEquals( newHashSet("a", "b"), gSet.get());
+    }
 ```
-
-Output for PNCounter code:
-**********************************
-
-Replica1 value =1
-
-Replica1 value =2
-
-Replica2 value =1
-
-Replica2 value =2
-
-Replica1 value after merge = 4
-
-**********************************

@@ -1,5 +1,6 @@
 package crdt.Graph;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -190,6 +191,37 @@ public class GraphTest {
     }
 
 
+
+    @Test
+    public void new_test(){
+        replica1.initGraph();
+        replica2.initGraph();
+
+        replica1.addBetweenVertex(startSentinel, a, endSentinel);
+        replica1.addBetweenVertex(a, b, endSentinel);
+        replica1.addBetweenVertex(a, c, endSentinel);
+
+
+        replica2.addBetweenVertex(startSentinel, c, endSentinel);
+        replica2.addBetweenVertex(c, a, endSentinel);
+        replica2.addBetweenVertex(c, b, endSentinel);
+
+        System.out.println("merged");
+        replica1.merge(replica2);
+        replica2.merge(replica1);
+
+        System.out.println(replica1.getGraph().verticesAdded);
+        System.out.println(replica1.getGraph().edgesAdded);
+
+        System.out.println(replica2.getGraph().verticesAdded);
+        System.out.println(replica2.getGraph().edgesAdded);
+
+        System.out.println("print graphs");
+        replica1.printGraphPaths(startSentinel);
+        replica2.printGraphPaths(startSentinel);
+
+        assertTrue(replica1.equals(replica2));
+    }
     /**
      * Test Union: Simple Merge to see if two graphs can merge together to represent the same Edges and Vertices.
      */
@@ -244,6 +276,7 @@ public class GraphTest {
         replica2.merge(replica1);
 
         replica1.removeVertex(c);
+
 
         replica1.merge(replica2);
         replica2.merge(replica1);
@@ -906,4 +939,7 @@ public class GraphTest {
             System.out.println(e);
         }
     }
+
+
+
 }
