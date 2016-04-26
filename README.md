@@ -19,16 +19,7 @@ Under the constraints of the CAP theorem they provide the strongest consistency 
 - TwoPhaseSet
 - add-wins Graph
 
-#State-based vs Operation-based
 
-#Counter (State-based) G-Counter
-A GCounter is a state-based counter that can only increment. A HashMap acts as a 
-collection of keys and values to map replicas to their unique integer. Executing the
-increment method can only increase the value associated with that replica
-by 1. The value method iterates through the entire HashMap and returns 
-the sum of all the values in the collection. Lastly, the merge method takes two
-CRDTs and takes the maximum of each integer in the collection.
-Example behaviour of a GSet.
 ============================
 PNCounter:
 ```java  
